@@ -21,8 +21,9 @@ SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
+LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
+CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 
@@ -31,8 +32,8 @@ LIBS =
 ##---------------------------------------------------------------------
 
 ## Using OpenGL loader: gl3w [default]
-SOURCES += /home/remy/Dev/git-imgui/examples/libs/gl3w/GL/gl3w.c
-CXXFLAGS += -I/home/remy/Dev/git-imgui/examples/libs/gl3w -DIMGUI_IMPL_OPENGL_LOADER_GL3W
+# SOURCES += /home/remy/Dev/git-imgui/examples/libs/gl3w/GL/gl3w.c
+# CXXFLAGS += -I/home/remy/Dev/git-imgui/examples/libs/gl3w -DIMGUI_IMPL_OPENGL_LOADER_GL3W
 
 ## Using OpenGL loader: glew
 ## (This assumes a system-wide installation)
@@ -98,12 +99,6 @@ endif
 
 %.o:$(IMGUI_DIR)/backends/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-%.o:../libs/gl3w/GL/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-%.o:../libs/glad/src/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
 
 all: $(EXE)
 	@echo Build complete for $(ECHO_MESSAGE)
