@@ -7,8 +7,10 @@ class AnnotationApp
 {
 public:
     // std::filesystem::path image_folder; // folder containing images to annotate
-    void update_images_folder(void);    // list image files
-    void ui_images_folder(void);        // draw the UI to displays files
+    AnnotationApp();
+    bool open_images_folder_flag;    // flag to open file dialog
+    void update_images_folder(void); // list image files
+    void ui_images_folder(void);     // draw the UI to displays files
 };
 
 #endif

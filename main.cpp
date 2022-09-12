@@ -32,31 +32,39 @@ int ImGui_AnnotationTool(void)
 
     ImGui::BeginChild("Pane2", ImVec2(200, 400), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-    // if (ImGui::BeginMenuBar("Annotations Menu"))
-    // {
-    //     // if (ImGui::BeginMenu("Annotations Menu"))
-    //     // {
-    //     //     ImGui::EndMenu();
-    //     // }
-    //     ImGui::EndMenuBar();
-    // }
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("Annotations Menu"))
+        {
+             if (ImGui::MenuItem("Open folder"))
+                app.open_images_folder_flag = true;
 
-    if (ImGui::Button("Open folder"))
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+   
+
+    if (app.open_images_folder_flag == true)
+    {
         ImGuiFileDialog::Instance()->OpenDialog("FolderChooser", "Choose a Directory", nullptr, ".", ImGuiFileDialogFlags_Modal);
 
-    // display
-    if (ImGuiFileDialog::Instance()->Display("FolderChooser"))
-    {
-        // action if OK
-        if (ImGuiFileDialog::Instance()->IsOk())
+        // display
+        if (ImGuiFileDialog::Instance()->Display("FolderChooser"))
         {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            // action
-        }
+            // action if OK
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                // action
+            }
 
-        // close
-        ImGuiFileDialog::Instance()->Close();
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            app.open_images_folder_flag = false;
+        }
     }
 
     ImGui::Text("Pane 2");
