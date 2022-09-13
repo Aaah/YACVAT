@@ -17,6 +17,7 @@
 EXE = tool
 IMGUI_DIR = /home/remy/Dev/git-imgui
 LIBIMGUIFILEDIALOG = lib/ImGuiFileDialog
+LIBSPDLOG = lib/spdlog/include
 
 SOURCES = main.cpp app.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
@@ -26,7 +27,7 @@ OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG)
+CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)
 CXXFLAGS += -g -Wall -Wformat
 LIBS =
 

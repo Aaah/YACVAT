@@ -10,15 +10,15 @@
 #endif
 
 #include <filesystem>
-#include "app.h"
-#include "ImGuiFileDialog.h"
+#include "app.h"             // context application
+#include "ImGuiFileDialog.h" // add-on filedialogs
+#include "spdlog/spdlog.h"   // logs
 
-bool check;
+// context application
 AnnotationApp app;
 
 int ImGui_AnnotationTool(void)
 {
-
     ImGui::SetNextWindowSizeConstraints(ImVec2(300.f, -1.f), ImVec2(INFINITY, -1.f));
     ImGui::Begin("Annotation Tool", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -36,15 +36,13 @@ int ImGui_AnnotationTool(void)
     {
         if (ImGui::BeginMenu("Annotations Menu"))
         {
-             if (ImGui::MenuItem("Open folder"))
+            if (ImGui::MenuItem("Open folder"))
                 app.open_images_folder_flag = true;
 
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
-
-   
 
     if (app.open_images_folder_flag == true)
     {
@@ -56,9 +54,7 @@ int ImGui_AnnotationTool(void)
             // action if OK
             if (ImGuiFileDialog::Instance()->IsOk())
             {
-                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-                // action
+                app.update_images_folder(ImGuiFileDialog::Instance()->GetCurrentPath());
             }
 
             // close
@@ -123,6 +119,9 @@ int ImGui_AnnotationTool(void)
 // Main code
 int main(int, char **)
 {
+    // logs level
+    spdlog::set_level(spdlog::level::debug);
+
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,
     // depending on whether SDL_INIT_GAMECONTROLLER is enabled or disabled.. updating to latest version of SDL is recommended!)
