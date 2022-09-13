@@ -16,8 +16,9 @@ public:
     void ui_images_folder(void);                 // draw the UI to displays files
 
 private:
-    std::vector<char *> image_files;      // list of valid images in the folder
-    std::set<std::string> extensions_set; // list of extensions accepted as images
+    std::string images_folder;        // path to valid folder containing images
+    std::vector<char *> image_files; // list of valid images in the folder
+    std::set<std::string> ext_set;   // list of extensions accepted as images
 };
 
 #endif

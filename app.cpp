@@ -1,5 +1,6 @@
 #include "app.h"
 #include "spdlog/spdlog.h"
+#include "imgui.h"
 
 #include <iostream>
 #include <vector>
@@ -8,16 +9,24 @@
 
 AnnotationApp::AnnotationApp(void)
 {
+    spdlog::info("Instanciation of AnnotationApp object.");
+
     open_images_folder_flag = false;
 
-    extensions_set.clear();
-    extensions_set.insert("png");
-    extensions_set.insert("jpeg");
-    extensions_set.insert("jpg");
+    ext_set.clear();
+    ext_set.insert("png");
+    ext_set.insert("jpeg");
+    ext_set.insert("jpg");
+
+    for (auto e : ext_set)
+        spdlog::debug("set of extension allowed : {}", e);
 }
 
 void AnnotationApp::ui_images_folder(void)
 {
+    // does not work
+    for (std::string e : this->image_files)
+        ImGui::Button(e.c_str());
 }
 
 void AnnotationApp::update_images_folder(std::string path)
@@ -49,7 +58,7 @@ void AnnotationApp::update_images_folder(std::string path)
 
             spdlog::debug("extension : {}", extension);
 
-            if (this->extensions_set.find(extension) != this->extensions_set.end())
+            if (this->ext_set.find(extension) != this->ext_set.end())
             {
                 this->image_files.push_back(diread->d_name);
                 spdlog::info("File added : {}", diread->d_name);
@@ -61,4 +70,7 @@ void AnnotationApp::update_images_folder(std::string path)
     {
         spdlog::error("Folder {} cannot be open", path.c_str());
     }
+
+    // memorizing the folder for later use
+    this->images_folder = path;
 }
