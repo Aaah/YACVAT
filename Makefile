@@ -17,19 +17,20 @@
 EXE = tool
 IMGUI_DIR = /home/remy/Dev/git-imgui
 LIBIMGUIFILEDIALOG = lib/ImGuiFileDialog
-LIBSPDLOG = lib/spdlog/include
+LIBSPDLOG = lib/spdlog
 
 SOURCES = main.cpp app.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 SOURCES += $(LIBIMGUIFILEDIALOG)/ImGuiFileDialog.cpp
+SOURCES += $(LIBSPDLOG)/src/spdlog.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)
-CXXFLAGS += -g -Wall -Wformat
-LIBS =
+CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)/include
+CXXFLAGS += -g -Wall -Wformat -DSPDLOG_COMPILED_LIB
+LIBS = -L$(LIBSPDLOG)/build -lspdlog -pthread
 
 ##---------------------------------------------------------------------
 ## OPENGL LOADER
@@ -105,6 +106,9 @@ endif
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.o:$(LIBIMGUIFILEDIALOG)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.o:$(LIBSPDLOG)/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 all: $(EXE)

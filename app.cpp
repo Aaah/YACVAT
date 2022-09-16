@@ -25,8 +25,16 @@ AnnotationApp::AnnotationApp(void)
 void AnnotationApp::ui_images_folder(void)
 {
     // does not work
-    for (std::string e : this->image_files)
+    int n = 0;
+    for (auto e : this->image_files)
+    {
         ImGui::Button(e.c_str());
+    }
+}
+
+void AnnotationApp::read_image(std::string path)
+{
+    // todo : find a way to open image and display it
 }
 
 void AnnotationApp::update_images_folder(std::string path)
@@ -60,7 +68,7 @@ void AnnotationApp::update_images_folder(std::string path)
 
             if (this->ext_set.find(extension) != this->ext_set.end())
             {
-                this->image_files.push_back(diread->d_name);
+                this->image_files.push_back(fn);
                 spdlog::info("File added : {}", diread->d_name);
             }
         }
