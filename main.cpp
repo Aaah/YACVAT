@@ -26,6 +26,9 @@ int ImGui_AnnotationTool(void)
 
     ImGui::BeginChild("Pane1", ImVec2(800, 400), false, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::Text("Pane 1");
+
+    app.ui_image_current();
+
     ImGui::EndChild();
 
     ImGui::SameLine();
