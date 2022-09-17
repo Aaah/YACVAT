@@ -27,12 +27,15 @@ AnnotationApp::AnnotationApp(void)
 
 void AnnotationApp::ui_images_folder(void)
 {
-    // does not work
     int n = 0;
+    static int selected = -1;
     for (auto e : this->image_files)
     {
-        if (ImGui::Button(e.c_str()))
+        // single selectable to display filenames
+        if (ImGui::Selectable(e.c_str(), selected == n))
         {
+            selected = n;
+
             // create full filename
             // todo : use boost lib
             std::string fn = this->images_folder + "/" + e;
@@ -45,6 +48,7 @@ void AnnotationApp::ui_images_folder(void)
             bool ret = this->read_image(fn.c_str(), &current_image_texture, &current_image_width, &current_image_height);
             IM_ASSERT(ret);
         }
+        n++;
     }
 }
 
