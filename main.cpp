@@ -66,11 +66,6 @@ int ImGui_AnnotationTool(void)
         }
     }
 
-    ImGui::Text("Pane 2");
-
-    // // open Dialog Simple
-    // if (ImGui::Button("Open File Dialog"))
-
     // display images files
     app.ui_images_folder();
 
