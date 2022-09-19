@@ -24,8 +24,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 
-    ImGui::BeginChild("Pane1", ImVec2(800, 400), false, ImGuiWindowFlags_AlwaysAutoResize);
-    ImGui::Text("Pane 1");
+    ImGui::BeginChild("Pane1", ImVec2(600, 400), false, ImGuiWindowFlags_AlwaysAutoResize);
 
     app.ui_image_current();
 
@@ -87,7 +86,7 @@ int ImGui_AnnotationTool(void)
         ImGui::EndMenuBar();
     }
 
-    ImGui::Text("Pane 3");
+    app.ui_annotations_menu();
 
     ImGui::EndChild();
 
@@ -196,6 +195,7 @@ int main(int, char **)
 
     // Our state
     bool show_demo_window = true;
+    bool show_metrics = true;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -226,6 +226,9 @@ int main(int, char **)
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
+
+        if (show_metrics)
+            ImGui::ShowMetricsWindow(&show_metrics);
 
         ImGui_AnnotationTool();
 

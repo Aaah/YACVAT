@@ -25,6 +25,58 @@ AnnotationApp::AnnotationApp(void)
         spdlog::debug("set of extension allowed : {}", e);
 }
 
+void AnnotationApp::ui_annotations_menu(void)
+{
+
+    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
+    // static ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue;
+
+    if (ImGui::BeginTable("table_annotations", 3, flags))
+    {
+        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+
+        static char _unused_ids[64] = "";
+
+        for (int n = 0; n < this->annotations.size(); n++)
+        {
+            ImGui::TableNextRow();
+
+            // shortcut to select the annotation
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%d", n);
+
+            // label of the annotation
+            ImGui::TableSetColumnIndex(1);
+            sprintf(_unused_ids, "##inputtext%d", n);
+            ImGui::PushItemWidth(-1);
+            if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                spdlog::debug("[label {}] new label : {}", n, this->annotations[n].new_label);
+            }
+            ImGui::PopItemWidth();
+
+            // annotation type
+            ImGui::TableSetColumnIndex(2);
+            sprintf(_unused_ids, "##combotext%d", n);
+            ImGui::PushItemWidth(-1);
+            if (ImGui::Combo(_unused_ids, (int *)&this->annotations[n].type, "POINT\0AREA"))
+            {
+                spdlog::debug("[label {}] new type : {}", n, this->annotations[n].type);
+            }
+            ImGui::PopItemWidth();
+        }
+        ImGui::EndTable();
+    }
+
+    if (ImGui::Button("+"))
+    {
+        this->annotations.push_back(Annotation("new label", ANNOTATION_TYPE_POINT));
+    }
+}
+
 void AnnotationApp::ui_images_folder(void)
 {
     int n = 0;
@@ -54,15 +106,22 @@ void AnnotationApp::ui_images_folder(void)
 
 void AnnotationApp::ui_image_current()
 {
-    // todo : load texture only once on file selection
     // load image in ram
     if (current_image_texture != 0)
     {
-        ImGui::Text("pointer = %p", current_image_texture);
-        ImGui::Text("size = %d x %d", current_image_width, current_image_height);
+        // ImGui::Text("pointer = %p", current_image_texture);
+        // ImGui::Text("size = %d x %d", current_image_width, current_image_height);
+        // ImGui::Text("window size = %.0f x %.0f", ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
-        // todo : find out how the image needs to be scaled
-        ImGui::Image((void *)(intptr_t)current_image_texture, ImVec2(current_image_width * 0.5f, current_image_height * 0.5f), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
+        this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
+        // spdlog::debug("Resizing factor : {}", this->scale);
+
+        ImGui::Image(
+            (void *)(intptr_t)current_image_texture,                           // image texture
+            ImVec2(current_image_width * scale, current_image_height * scale), // x and y dimensions (scale)
+            ImVec2(0.0f, 0.0f),                                                // (x,y) coordinates start in [0.0, 1.0]
+            ImVec2(1.0f, 1.0f)                                                 // (x,y) coordinates end in [0.0, 1.0]
+        );
     }
 }
 
@@ -145,4 +204,12 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
     *out_height = image_height;
 
     return true;
+}
+
+Annotation::Annotation(std::string label, annotation_type_t type)
+{
+    // copy attributes
+    this->label = label;
+    this->type = type;
+    strcpy(this->new_label, this->label.c_str());
 }
