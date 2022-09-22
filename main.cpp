@@ -86,7 +86,7 @@ int ImGui_AnnotationTool(void)
         ImGui::EndMenuBar();
     }
 
-    app.ui_annotations_menu();
+    app.ui_annotations_panel();
 
     ImGui::EndChild();
 

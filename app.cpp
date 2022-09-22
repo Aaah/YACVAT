@@ -25,11 +25,21 @@ AnnotationApp::AnnotationApp(void)
         spdlog::debug("set of extension allowed : {}", e);
 }
 
-void AnnotationApp::ui_annotations_menu(void)
+void AnnotationApp::ui_annotations_panel(void)
 {
+    if (this->annotations_file_exists)
+    {
+        this->ui_annotations_continue();
+    }
+    else
+    {
+        this->ui_annotations_setup();
+    }
+}
 
+void AnnotationApp::ui_annotations_setup(void)
+{
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
-    // static ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue;
 
     if (ImGui::BeginTable("table_annotations", 3, flags))
     {
@@ -71,10 +81,31 @@ void AnnotationApp::ui_annotations_menu(void)
         ImGui::EndTable();
     }
 
+    // add new annotation
     if (ImGui::Button("+"))
     {
         this->annotations.push_back(Annotation("new label", ANNOTATION_TYPE_POINT));
     }
+
+    // freeze current configuration and start labeling
+    ImGui::Separator();
+    ImGui::PushItemWidth(-1);
+    if (ImGui::Button("Save & start labeling"))
+    {
+        this->create_json_file();
+        this->check_annotations_file()
+    }
+    ImGui::PopItemWidth();
+}
+
+void AnnotationApp::create_json_file(void)
+{
+    // todo
+}
+
+void AnnotationApp::ui_annotations_continue(void)
+{
+    // todo
 }
 
 void AnnotationApp::ui_images_folder(void)
@@ -125,6 +156,32 @@ void AnnotationApp::ui_image_current()
     }
 }
 
+void AnnotationApp::check_annotations_file(void)
+{
+    DIR *dir;
+    struct dirent *diread;
+
+    // reset
+    this->annotations_file_exists = false;
+
+    // parse all files in the selected folder
+    if ((dir = opendir(this->images_folder.c_str())) != nullptr)
+    {
+        while ((diread = readdir(dir)) != nullptr)
+        {
+            // look for JSON file (annotations dump file)
+            if (!strcmp(diread->d_name, "annotations.json"))
+            {
+                this->annotations_file_exists = true;
+                spdlog::debug("CHECK ANNOTATION FILE : file found");
+                break;
+            }
+        }
+    }
+
+    spdlog::debug("CHECK ANNOTATION FILE : no file found");
+}
+
 void AnnotationApp::update_images_folder(std::string path)
 {
     DIR *dir;
@@ -169,6 +226,9 @@ void AnnotationApp::update_images_folder(std::string path)
 
     // memorizing the folder for later use
     this->images_folder = path;
+
+    // check the presence of an annotation file
+    this->check_annotations_file();
 }
 
 // Simple helper function to load an image into a OpenGL texture with common settings
