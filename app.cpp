@@ -29,15 +29,17 @@ void AnnotationApp::ui_annotations_panel(void)
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
-    if (ImGui::BeginTable("table_annotations", 4, flags))
+    if (ImGui::BeginTable("table_annotations", 5, flags))
     {
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableHeadersRow();
 
         static char _unused_ids[64] = "";
+        bool update_json_flag = false;
 
         for (int n = 0; n < this->annotations.size(); n++)
         {
@@ -45,11 +47,15 @@ void AnnotationApp::ui_annotations_panel(void)
 
             // shortcut to select the annotation
             ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%d", n);
+            this->annotations[n].shortcut = n;
+            ImGui::Text("%d", this->annotations[n].shortcut);
 
             ImGui::TableSetColumnIndex(1);
             sprintf(_unused_ids, "##color%d", n);
-            ImGui::ColorEdit4(_unused_ids, this->annotations[n].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            if (ImGui::ColorEdit4(_unused_ids, this->annotations[n].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel))
+            {
+                update_json_flag = true;
+            }
 
             // label of the annotation
             ImGui::TableSetColumnIndex(2);
@@ -58,7 +64,7 @@ void AnnotationApp::ui_annotations_panel(void)
             if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
             {
                 spdlog::debug("[label {}] new label : {}", n, this->annotations[n].new_label);
-                this->json_update_header();
+                update_json_flag = true;
             }
             ImGui::PopItemWidth();
 
@@ -69,11 +75,23 @@ void AnnotationApp::ui_annotations_panel(void)
             if (ImGui::Combo(_unused_ids, (int *)&this->annotations[n].type, "POINT\0AREA"))
             {
                 spdlog::debug("[label {}] new type : {}", n, this->annotations[n].type);
-                this->json_update_header();
+                update_json_flag = true;
             }
             ImGui::PopItemWidth();
+
+            ImGui::TableSetColumnIndex(4);
+            sprintf(_unused_ids, "-##delbuttont%d", n);
+            if (ImGui::Button(_unused_ids))
+            {
+                this->annotations.erase(this->annotations.begin() + n);
+            }
         }
         ImGui::EndTable();
+
+        if (update_json_flag == true)
+        {
+            this->json_update_header();
+        }
     }
 
     // add new annotation
@@ -90,7 +108,6 @@ void AnnotationApp::ui_annotations_panel(void)
 
 void AnnotationApp::json_update_header(void)
 {
-
 }
 
 void AnnotationApp::ui_images_folder(void)
