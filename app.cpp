@@ -27,22 +27,11 @@ AnnotationApp::AnnotationApp(void)
 
 void AnnotationApp::ui_annotations_panel(void)
 {
-    if (this->annotations_file_exists)
-    {
-        this->ui_annotations_continue();
-    }
-    else
-    {
-        this->ui_annotations_setup();
-    }
-}
-
-void AnnotationApp::ui_annotations_setup(void)
-{
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
-    if (ImGui::BeginTable("table_annotations", 3, flags))
+    if (ImGui::BeginTable("table_annotations", 4, flags))
     {
+        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
@@ -58,23 +47,29 @@ void AnnotationApp::ui_annotations_setup(void)
             ImGui::TableSetColumnIndex(0);
             ImGui::Text("%d", n);
 
-            // label of the annotation
             ImGui::TableSetColumnIndex(1);
+            sprintf(_unused_ids, "##color%d", n);
+            ImGui::ColorEdit4(_unused_ids, this->annotations[n].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+
+            // label of the annotation
+            ImGui::TableSetColumnIndex(2);
             sprintf(_unused_ids, "##inputtext%d", n);
             ImGui::PushItemWidth(-1);
             if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
             {
                 spdlog::debug("[label {}] new label : {}", n, this->annotations[n].new_label);
+                this->json_update_header();
             }
             ImGui::PopItemWidth();
 
             // annotation type
-            ImGui::TableSetColumnIndex(2);
+            ImGui::TableSetColumnIndex(3);
             sprintf(_unused_ids, "##combotext%d", n);
             ImGui::PushItemWidth(-1);
             if (ImGui::Combo(_unused_ids, (int *)&this->annotations[n].type, "POINT\0AREA"))
             {
                 spdlog::debug("[label {}] new type : {}", n, this->annotations[n].type);
+                this->json_update_header();
             }
             ImGui::PopItemWidth();
         }
@@ -89,23 +84,13 @@ void AnnotationApp::ui_annotations_setup(void)
 
     // freeze current configuration and start labeling
     ImGui::Separator();
-    ImGui::PushItemWidth(-1);
-    if (ImGui::Button("Save & start labeling"))
-    {
-        this->create_json_file();
-        this->check_annotations_file()
-    }
-    ImGui::PopItemWidth();
+
+    // todo list annotations in the current image
 }
 
-void AnnotationApp::create_json_file(void)
+void AnnotationApp::json_update_header(void)
 {
-    // todo
-}
 
-void AnnotationApp::ui_annotations_continue(void)
-{
-    // todo
 }
 
 void AnnotationApp::ui_images_folder(void)

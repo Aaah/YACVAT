@@ -72,7 +72,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Pane3", ImVec2(200, 400), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+    ImGui::BeginChild("Pane3", ImVec2(400, 400), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
     if (ImGui::BeginMenuBar())
     {

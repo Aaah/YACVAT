@@ -19,6 +19,7 @@ IMGUI_DIR = /home/remy/Dev/git-imgui
 LIBIMGUIFILEDIALOG = lib/ImGuiFileDialog
 LIBSPDLOG = lib/spdlog
 LIBSTB = lib/stb
+LIBJSON = lib/nlhomann-json
 
 SOURCES = main.cpp app.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
@@ -29,7 +30,7 @@ OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 LINUX_GL_LIBS = -lGL
 
-CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)/include -I$(LIBSTB)
+CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)/include -I$(LIBSTB) -I$(LIBJSON)/single_include
 CXXFLAGS += -g -Wall -Wformat -DSPDLOG_COMPILED_LIB
 LIBS = -L$(LIBSPDLOG)/build -lspdlog -pthread
 

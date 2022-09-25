@@ -20,6 +20,8 @@ public:
     std::string label;      // name of the annotation
     char new_label[64];     // new (during edition) name of the annotation
     annotation_type_t type; // type of the annotation (single point coordinates, rectangle area...)
+    float color[4];         // color to display square / point on the image
+    int shortcut;           // key to select annotation
 };
 
 class AnnotationApp
@@ -50,7 +52,8 @@ private:
     void ui_annotations_continue(void); // ui panel if an annotations file exists
     void ui_annotations_setup(void);    // ui panel if no annotations file exists
     void check_annotations_file(void);  // look for the presence of an annotations file
-    void create_json_file(void);        // create annotations file (with labels and types)
+    void json_update_annoations(void);  // create annotations file (with labels and types)
+    void json_update_header(void);      // create annotations file (with labels and types)
 };
 
 #endif
