@@ -97,7 +97,7 @@ void AnnotationApp::ui_annotations_panel(void)
     // add new annotation
     if (ImGui::Button("+"))
     {
-        this->annotations.push_back(Annotation("new label", ANNOTATION_TYPE_POINT));
+        this->annotations.push_back(AnnotationConfig("new label"));
     }
 
     // freeze current configuration and start labeling
@@ -268,10 +268,4 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
     return true;
 }
 
-Annotation::Annotation(std::string label, annotation_type_t type)
-{
-    // copy attributes
-    this->label = label;
-    this->type = type;
-    strcpy(this->new_label, this->label.c_str());
-}
+

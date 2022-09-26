@@ -19,9 +19,9 @@ IMGUI_DIR = /home/remy/Dev/git-imgui
 LIBIMGUIFILEDIALOG = lib/ImGuiFileDialog
 LIBSPDLOG = lib/spdlog
 LIBSTB = lib/stb
-LIBJSON = lib/nlhomann-json
+LIBJSON = lib/json
 
-SOURCES = main.cpp app.cpp
+SOURCES = main.cpp app.cpp annotations.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 SOURCES += $(LIBIMGUIFILEDIALOG)/ImGuiFileDialog.cpp
