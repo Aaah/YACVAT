@@ -93,7 +93,7 @@ void AnnotationApp::ui_annotations_panel(void)
 
         if (update_json_flag == true)
         {
-            this->json_update_header();
+            this->json_write();
         }
     }
 
@@ -109,17 +109,22 @@ void AnnotationApp::ui_annotations_panel(void)
     // todo list annotations in the current image
 }
 
-void AnnotationApp::json_update_header(void)
+void AnnotationApp::json_write(void)
 {
-    // // check if the annotation file exists
-    // if (this->annotations_file_exists == false)
-    //     return;
+    spdlog::debug("Writing json file : {}", this->annotation_fname.c_str());
 
-    // // parse the annotation file
-    // std::ifstream f(this->annotation_fname.c_str());
-    // nlohmann::json data = nlohmann::json::parse(f);
+    // check if the annotation file exists, create it if needed
+    if (!this->annotations_file_exists)
+    {
+        spdlog::info("Creating json file : {}", this->annotation_fname.c_str());
+        std::fstream fs;
+        fs.open(this->annotation_fname, std::ios::out | std::ios::app);
+        fs.close();
+    }
 
-    // // compose annotations from the header
+    // dump header
+    
+
 }
 
 void AnnotationApp::json_read(void)
