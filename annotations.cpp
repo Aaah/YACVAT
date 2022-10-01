@@ -1,11 +1,8 @@
 #include "annotations.h"
 #include "nlohmann/json.hpp"
+#include <fstream>
 
-// #include <stdlib> /* srand, rand */
-// #include <time>   /* time */
-
-// todo : change
-AnnotationConfig::AnnotationConfig(std::string label)
+Annotation::Annotation(std::string label)
 {
     // set attributes
     this->label = label;
@@ -20,4 +17,29 @@ AnnotationConfig::AnnotationConfig(std::string label)
     strcpy(this->new_label, this->label.c_str());
 }
 
-// todo : json_read & json_write
+bool Annotation::json_read(std::string fname)
+{
+    std::ifstream f(fname.c_str());
+    nlohmann::json data = nlohmann::json::parse(f);
+
+    // header
+
+    // ? the app has to read and parse the json
+
+    // instances
+    return true;
+}
+
+bool Annotation::json_write(std::string fname)
+{
+    // header
+
+    // ? if the file does not exist, create it, return false, else return true
+    // ? if the label does not exist : dump it in the header section
+    // ? if the label exists already : update attributes accordingly to comments in the header
+
+    // instances
+
+    // ? replace all instances
+    return true;
+}

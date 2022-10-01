@@ -7,6 +7,9 @@
 #include <dirent.h>
 #include <set>
 
+#include "nlohmann/json.hpp"
+#include <fstream>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -41,7 +44,7 @@ void AnnotationApp::ui_annotations_panel(void)
         static char _unused_ids[64] = "";
         bool update_json_flag = false;
 
-        for (int n = 0; n < this->annotations.size(); n++)
+        for (long unsigned n = 0; n < this->annotations.size(); n++)
         {
             ImGui::TableNextRow();
 
@@ -51,7 +54,7 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::Text("%d", this->annotations[n].shortcut);
 
             ImGui::TableSetColumnIndex(1);
-            sprintf(_unused_ids, "##color%d", n);
+            sprintf(_unused_ids, "##color%ld", n);
             if (ImGui::ColorEdit4(_unused_ids, this->annotations[n].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel))
             {
                 update_json_flag = true;
@@ -59,7 +62,7 @@ void AnnotationApp::ui_annotations_panel(void)
 
             // label of the annotation
             ImGui::TableSetColumnIndex(2);
-            sprintf(_unused_ids, "##inputtext%d", n);
+            sprintf(_unused_ids, "##inputtext%ld", n);
             ImGui::PushItemWidth(-1);
             if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
             {
@@ -70,7 +73,7 @@ void AnnotationApp::ui_annotations_panel(void)
 
             // annotation type
             ImGui::TableSetColumnIndex(3);
-            sprintf(_unused_ids, "##combotext%d", n);
+            sprintf(_unused_ids, "##combotext%ld", n);
             ImGui::PushItemWidth(-1);
             if (ImGui::Combo(_unused_ids, (int *)&this->annotations[n].type, "POINT\0AREA"))
             {
@@ -80,7 +83,7 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::PopItemWidth();
 
             ImGui::TableSetColumnIndex(4);
-            sprintf(_unused_ids, "-##delbuttont%d", n);
+            sprintf(_unused_ids, "-##delbuttont%ld", n);
             if (ImGui::Button(_unused_ids))
             {
                 this->annotations.erase(this->annotations.begin() + n);
@@ -97,7 +100,7 @@ void AnnotationApp::ui_annotations_panel(void)
     // add new annotation
     if (ImGui::Button("+"))
     {
-        this->annotations.push_back(AnnotationConfig("new label"));
+        this->annotations.push_back(Annotation("new label"));
     }
 
     // freeze current configuration and start labeling
@@ -108,6 +111,67 @@ void AnnotationApp::ui_annotations_panel(void)
 
 void AnnotationApp::json_update_header(void)
 {
+    // // check if the annotation file exists
+    // if (this->annotations_file_exists == false)
+    //     return;
+
+    // // parse the annotation file
+    // std::ifstream f(this->annotation_fname.c_str());
+    // nlohmann::json data = nlohmann::json::parse(f);
+
+    // // compose annotations from the header
+}
+
+void AnnotationApp::json_read(void)
+{
+    spdlog::debug("Parsing json file : {}", this->annotation_fname.c_str());
+
+    // check if the annotation file exists
+    if (this->annotations_file_exists == false)
+        return;
+
+    // parse the annotation file
+    std::ifstream f(this->annotation_fname.c_str());
+    this->json = nlohmann::json::parse(f);
+
+    auto header = this->json["header"];
+    if (header != NULL)
+    {
+        // empty list of annotations
+        this->annotations.clear();
+
+        for (nlohmann::json::iterator i = header.begin(); i != header.end(); ++i)
+        {
+            // create new annotation
+            Annotation _ann = Annotation(i.key());
+
+            // get attributes
+            auto val = i.value();
+
+            for (nlohmann::json::iterator it = val.begin(); it != val.end(); ++it)
+            {
+                std::string _key = it.key();
+
+                if (_key == "type")
+                {
+                    _ann.type = val["type"].get<annotation_type_t>();
+                }
+
+                if (_key == "color")
+                {
+                    auto _vec = val["color"].get<std::vector<float>>();
+                    for (int n = 0; n < 4; n++)
+                        _ann.color[n] = _vec[n];
+                }
+            }
+
+            // add annotation to the list of valid annotations
+            this->annotations.push_back(_ann);
+        }
+    }
+
+    // compose annotations from the header
+    // get current image info
 }
 
 void AnnotationApp::ui_images_folder(void)
@@ -160,28 +224,9 @@ void AnnotationApp::ui_image_current()
 
 void AnnotationApp::check_annotations_file(void)
 {
-    DIR *dir;
-    struct dirent *diread;
-
-    // reset
-    this->annotations_file_exists = false;
-
-    // parse all files in the selected folder
-    if ((dir = opendir(this->images_folder.c_str())) != nullptr)
-    {
-        while ((diread = readdir(dir)) != nullptr)
-        {
-            // look for JSON file (annotations dump file)
-            if (!strcmp(diread->d_name, "annotations.json"))
-            {
-                this->annotations_file_exists = true;
-                spdlog::debug("CHECK ANNOTATION FILE : file found");
-                break;
-            }
-        }
-    }
-
-    spdlog::debug("CHECK ANNOTATION FILE : no file found");
+    std::ifstream f(this->annotation_fname.c_str());
+    this->annotations_file_exists = f.good();
+    spdlog::debug("checking existence of annotation file : {}", this->annotations_file_exists);
 }
 
 void AnnotationApp::update_images_folder(std::string path)
@@ -229,8 +274,13 @@ void AnnotationApp::update_images_folder(std::string path)
     // memorizing the folder for later use
     this->images_folder = path;
 
-    // check the presence of an annotation file
+    // create a priori the annotation file name
+    this->annotation_fname = path + "/annotations.json";
+    spdlog::debug("Expected annotation file : {}", this->annotation_fname.c_str());
+
+    // read and parse json file if it exists
     this->check_annotations_file();
+    this->json_read();
 }
 
 // Simple helper function to load an image into a OpenGL texture with common settings
@@ -268,4 +318,21 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
     return true;
 }
 
+// void AnnotationApp::json_read(void)
+// {
+//     /*
+//     Access when selecting a folder :
+//     - create file if it does not exist
+//     - parse header and populate annotations
+//      */
 
+//     // check for the annotation file and create it if needed
+//     // todo
+//     this->check_annotations_file();
+//     if (!this->annotations_file_exists)
+//     {
+//         this->fs.open(this->annotation_fname, std::ios::in | std::ios::out | std::ios::app);
+//     }
+
+//     // read header file
+// }

@@ -1,5 +1,5 @@
-#ifndef __ANNOTATIONS_H__
-#define __ANNOTATIONS_H__
+#ifndef ANNOTATIONS_H
+#define ANNOTATIONS_H
 
 #include <string>
 
@@ -27,21 +27,31 @@ typedef enum
     ANNOTATION_TYPE_AREA,
 } annotation_type_t;
 
-// todo : mother class integrating header (current annotations) ? vs actual annotations
-
-class AnnotationConfig
+class Annotation
 {
 public:
-    AnnotationConfig(std::string label); // init
-    bool json_read(void);          // parse annotation file
-    bool json_write(void);         // dump annotations to file
+    Annotation(std::string label);      // init
+    bool json_read(std::string fname);  // parse annotation file
+    bool json_write(std::string fname); // dump annotations to file
 
     std::string label;      // name of the annotation
     char new_label[64];     // new (during edition) name of the annotation
     annotation_type_t type; // type of the annotation (single point coordinates, rectangle area...)
     float color[4];         // color to display square / point on the image
     int shortcut;           // key to select annotation
+
+    // std::vector<AnnotationInstance> inst; // actual annotations on the current image
+
 private:
 };
+
+// class AnnotationInstance
+// {
+// public:
+//     AnnotationInstance(void); // init
+//     void draw(void);          // draw itself on picture
+
+// private:
+// }
 
 #endif
