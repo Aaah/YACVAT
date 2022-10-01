@@ -1,4 +1,5 @@
 #include "annotations.h"
+#include "spdlog/spdlog.h"
 #include "nlohmann/json.hpp"
 #include <fstream>
 
@@ -17,29 +18,11 @@ Annotation::Annotation(std::string label)
     strcpy(this->new_label, this->label.c_str());
 }
 
-bool Annotation::json_read(std::string fname)
+AnnotationInstance::AnnotationInstance(void)
 {
-    std::ifstream f(fname.c_str());
-    nlohmann::json data = nlohmann::json::parse(f);
-
-    // header
-
-    // ? the app has to read and parse the json
-
-    // instances
-    return true;
 }
 
-bool Annotation::json_write(std::string fname)
+void AnnotationInstance::draw(void)
 {
-    // header
-
-    // ? if the file does not exist, create it, return false, else return true
-    // ? if the label does not exist : dump it in the header section
-    // ? if the label exists already : update attributes accordingly to comments in the header
-
-    // instances
-
-    // ? replace all instances
-    return true;
+    spdlog::debug("Drawing!");
 }

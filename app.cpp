@@ -33,7 +33,7 @@ void AnnotationApp::ui_annotations_panel(void)
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
     bool update_json_flag = false;
-    
+
     if (ImGui::BeginTable("table_annotations", 5, flags))
     {
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
@@ -45,14 +45,30 @@ void AnnotationApp::ui_annotations_panel(void)
 
         static char _unused_ids[64] = "";
 
-        for (long unsigned n = 0; n < this->annotations.size(); n++)
+        for (long unsigned int n = 0; n < this->annotations.size(); n++)
         {
             ImGui::TableNextRow();
 
             // shortcut to select the annotation
             ImGui::TableSetColumnIndex(0);
             this->annotations[n].shortcut = n;
-            ImGui::Text("%d", this->annotations[n].shortcut);
+            sprintf(_unused_ids, "%d##shortcutext", this->annotations[n].shortcut);
+            if (ImGui::Selectable(_unused_ids, &this->annotations[n].selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
+            {
+                spdlog::debug("selecting : {} -> {}", n, this->annotations[n].selected);
+
+                // only 1 selection allowed
+                if (this->annotations[n].selected)
+                {
+                    for (long unsigned int m = 0; m < this->annotations.size(); m++)
+                    {
+                        if (m != n)
+                            this->annotations[m].selected = false;
+                    }
+                }
+            }
+
+            // ImGui::Text("%d", this->annotations[n].shortcut);
 
             ImGui::TableSetColumnIndex(1);
             sprintf(_unused_ids, "##color%ld", n);
