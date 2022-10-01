@@ -32,6 +32,8 @@ void AnnotationApp::ui_annotations_panel(void)
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
+    bool update_json_flag = false;
+    
     if (ImGui::BeginTable("table_annotations", 5, flags))
     {
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
@@ -42,7 +44,6 @@ void AnnotationApp::ui_annotations_panel(void)
         ImGui::TableHeadersRow();
 
         static char _unused_ids[64] = "";
-        bool update_json_flag = false;
 
         for (long unsigned n = 0; n < this->annotations.size(); n++)
         {
@@ -66,7 +67,8 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::PushItemWidth(-1);
             if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                spdlog::debug("[label {}] new label : {}", n, this->annotations[n].new_label);
+                this->annotations[n].label = this->annotations[n].new_label; // basic recopy for now
+                spdlog::debug("[label {}] new label : {}", n, this->annotations[n].label);
                 update_json_flag = true;
             }
             ImGui::PopItemWidth();
@@ -87,20 +89,22 @@ void AnnotationApp::ui_annotations_panel(void)
             if (ImGui::Button(_unused_ids))
             {
                 this->annotations.erase(this->annotations.begin() + n);
+                update_json_flag = true;
             }
         }
         ImGui::EndTable();
-
-        if (update_json_flag == true)
-        {
-            this->json_write();
-        }
     }
 
     // add new annotation
     if (ImGui::Button("+"))
     {
         this->annotations.push_back(Annotation("new label"));
+        update_json_flag = true;
+    }
+
+    if (update_json_flag == true)
+    {
+        this->json_write();
     }
 
     // freeze current configuration and start labeling
@@ -117,14 +121,22 @@ void AnnotationApp::json_write(void)
     if (!this->annotations_file_exists)
     {
         spdlog::info("Creating json file : {}", this->annotation_fname.c_str());
-        std::fstream fs;
         fs.open(this->annotation_fname, std::ios::out | std::ios::app);
         fs.close();
     }
 
-    // dump header
-    
+    // create header
+    nlohmann::json new_header;
 
+    for (long unsigned n = 0; n < this->annotations.size(); n++)
+    {
+        new_header["header"][this->annotations[n].label.c_str()] = {{"type", this->annotations[n].type},
+                                                                    {"color", this->annotations[n].color}};
+    }
+
+    // flush file
+    std::ofstream f(this->annotation_fname.c_str());
+    f << std::setw(4) << new_header << std::endl; // pretty json using setw(4)
 }
 
 void AnnotationApp::json_read(void)
