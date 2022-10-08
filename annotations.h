@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include "fsm.h"
+#include "imgui.h"
 
 /*
 
@@ -28,13 +30,24 @@ typedef enum
     ANNOTATION_TYPE_AREA,
 } annotation_type_t;
 
+// states used to handle rendering of annotations instances
+typedef enum
+{
+    STATE_CREATE = 1,
+    STATE_IDLE,
+    STATE_EDIT,
+} draw_states_t;
+
 class AnnotationInstance
 {
 public:
-    AnnotationInstance(void); // init
-    void draw(void);          // draw itself on picture
+    // methods
+    AnnotationInstance(ImVec2 pos); // init
+    void draw(void);                // draw itself on picture
 
-    int coords[4]; // coordinates : x_start, y_start, x_end, y_end
+    // attributes
+    int coords[4];                         // coordinates : x_start, y_start, x_end, y_end
+    FSM::Fsm<int, STATE_CREATE, char> fsm; // state machine to handle rendering
 
 private:
 };
@@ -42,8 +55,10 @@ private:
 class Annotation
 {
 public:
+    // methods
     Annotation(std::string label); // init
 
+    // attributes
     std::string label;      // name of the annotation
     char new_label[64];     // new (during edition) name of the annotation
     annotation_type_t type; // type of the annotation (single point coordinates, rectangle area...)

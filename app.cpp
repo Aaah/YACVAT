@@ -13,6 +13,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+static void glDrawRectangle(void);
+
 AnnotationApp::AnnotationApp(void)
 {
     spdlog::info("Instanciation of AnnotationApp object.");
@@ -67,8 +69,6 @@ void AnnotationApp::ui_annotations_panel(void)
                     }
                 }
             }
-
-            // ImGui::Text("%d", this->annotations[n].shortcut);
 
             ImGui::TableSetColumnIndex(1);
             sprintf(_unused_ids, "##color%ld", n);
@@ -229,6 +229,8 @@ void AnnotationApp::ui_images_folder(void)
             current_image_texture = 0;
             bool ret = this->read_image(fn.c_str(), &current_image_texture, &current_image_width, &current_image_height);
             IM_ASSERT(ret);
+
+            this->scale = 0.0;
         }
         n++;
     }
@@ -237,22 +239,87 @@ void AnnotationApp::ui_images_folder(void)
 void AnnotationApp::ui_image_current()
 {
     // load image in ram
-    if (current_image_texture != 0)
+    if (this->current_image_texture != 0)
     {
         // ImGui::Text("pointer = %p", current_image_texture);
         // ImGui::Text("size = %d x %d", current_image_width, current_image_height);
         // ImGui::Text("window size = %.0f x %.0f", ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
-        this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
-        // spdlog::debug("Resizing factor : {}", this->scale);
+        // compute scaling factor to fir to the window (pane1)
+        if (this->scale == 0.0)
+        {
+            this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
+            spdlog::debug("Resizing factor : {}", this->scale);
+        }
 
+        // draw all annotations instances on the image
+        for (long unsigned n = 0; n < this->annotations.size(); n++)
+        {
+            for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
+            {
+                this->annotations[n].inst[m].draw();
+            }
+        }
+
+        // draw image
         ImGui::Image(
-            (void *)(intptr_t)current_image_texture,                           // image texture
-            ImVec2(current_image_width * scale, current_image_height * scale), // x and y dimensions (scale)
+            (void *)(intptr_t)this->current_image_texture,                     // image texture
+            ImVec2(current_image_width * scale, current_image_height * scale), // x and y dimensions (scaled)
             ImVec2(0.0f, 0.0f),                                                // (x,y) coordinates start in [0.0, 1.0]
             ImVec2(1.0f, 1.0f)                                                 // (x,y) coordinates end in [0.0, 1.0]
         );
+
+        // fsm to handle drawing annotations
+        // - todo : draw all existing annotations
+        // - todo : add new annotation process
+        // - todo : edit existing annotation (select + change attributes)
+        this->update_annotation_fsm();
     }
+}
+
+void AnnotationApp::update_annotation_fsm(void)
+{
+    ImVec2 _w = ImGui::GetWindowPos();
+    ImVec2 _m = ImGui::GetMousePos();
+    ImVec2 cursor_pos = ImVec2(_m.x - _w.x, _m.y - _w.y);
+    ImGui::Text("Mouse in window: (%g, %g)", cursor_pos.x, cursor_pos.y);
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+    {
+        spdlog::debug("POUET");
+        // if all annotation instances are idle, add new one
+        bool create_new_instance_flag = true;
+        for (long unsigned n = 0; n < this->annotations.size(); n++)
+        {
+            for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
+            {
+                if (this->annotations[n].inst[m].fsm.state() != STATE_IDLE)
+                {
+                    create_new_instance_flag = false;
+                    continue;
+                }
+            }
+        }
+
+        if (create_new_instance_flag)
+        {
+            for (long unsigned n = 0; n < this->annotations.size(); n++)
+            {
+                if (this->annotations[n].selected)
+                {
+                    this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos));
+                    spdlog::info("New Annotation Instance <{}, type {}> : ({},{}) in state {}",
+                                 this->annotations[n].label,
+                                 this->annotations[n].type,
+                                 this->annotations[n].inst.back().coords[0],
+                                 this->annotations[n].inst.back().coords[1],
+                                 this->annotations[n].inst.back().fsm.state());
+                }
+            }
+        }
+    }
+
+    // todo : render all annotation instances
 }
 
 void AnnotationApp::check_annotations_file(void)
@@ -349,6 +416,29 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
     *out_height = image_height;
 
     return true;
+}
+
+void glDrawRectangle()
+{
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Set line color
+    glColor3f(1.0, 1.0, 1.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
+    // Begin POLYGON coordinates
+    glBegin(GL_POLYGON);
+    // Provide coordinates
+    glVertex2f(-0.5, -0.5);
+    glVertex2f(-0.5, 0.5);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.5, -0.5);
+    // End POLYGON coordinate
+    glEnd();
+
+    // Forces previously issued OpenGL commands to begin execution
+    glFlush();
 }
 
 // void AnnotationApp::json_read(void)

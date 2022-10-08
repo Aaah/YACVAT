@@ -25,6 +25,7 @@ public:
     void ui_annotations_panel(void);             // create/edit annotations type
     void json_read(void);                        // read/write info to the annotation file
     void json_write(void);                       // read/write info to the annotation file
+    void update_annotation_fsm(void);            //
 
 private:
     std::string images_folder;            // path to valid folder containing images

@@ -1,7 +1,9 @@
 #include "annotations.h"
 #include "spdlog/spdlog.h"
 #include "nlohmann/json.hpp"
+#include "fsm.h"
 #include <fstream>
+#include "imgui.h"
 
 Annotation::Annotation(std::string label)
 {
@@ -18,8 +20,18 @@ Annotation::Annotation(std::string label)
     strcpy(this->new_label, this->label.c_str());
 }
 
-AnnotationInstance::AnnotationInstance(void)
+AnnotationInstance::AnnotationInstance(ImVec2 pos)
 {
+    // finite state machine instanciation
+    this->fsm.add_transitions({
+        {STATE_CREATE, STATE_IDLE, 'a', nullptr, nullptr},
+        {STATE_IDLE, STATE_EDIT, 'b', nullptr, nullptr},
+        {STATE_EDIT, STATE_IDLE, 'c', nullptr, nullptr},
+    });
+
+    // position of the instance on the window
+    this->coords[0] = pos.x;
+    this->coords[1] = pos.y;
 }
 
 void AnnotationInstance::draw(void)
