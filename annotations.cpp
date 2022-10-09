@@ -20,7 +20,18 @@ Annotation::Annotation(std::string label)
     strcpy(this->new_label, this->label.c_str());
 }
 
-AnnotationInstance::AnnotationInstance(ImVec2 pos)
+void Annotation::update_color(void)
+{
+    for (long unsigned int n = 0; n < this->inst.size(); n++)
+    {
+        for (int k = 0; k < 4; k++)
+            this->inst[n].color_u8[k] = this->color[k] * 255;
+    }
+}
+
+// -- INSTANCES
+
+AnnotationInstance::AnnotationInstance(ImVec2 pos, float color[4])
 {
     // finite state machine instanciation
     this->fsm.add_transitions({
@@ -31,6 +42,10 @@ AnnotationInstance::AnnotationInstance(ImVec2 pos)
 
     // position of the instance on the window
     this->set_corner_start(pos);
+
+    // convert color
+    for (int k = 0; k < 4; k++)
+        this->color_u8[k] = color[k] * 255;
 }
 
 void AnnotationInstance::set_corner_start(ImVec2 pos)
@@ -52,26 +67,21 @@ void AnnotationInstance::draw(void)
     ImVec2 _w = ImGui::GetWindowPos();
     ImVec2 _m = ImGui::GetMousePos();
 
+    // compute absolute coodinates
+    ImVec2 start = _w;
+    start.x += this->coords[0].x;
+    start.y += this->coords[0].y;
+
     if (this->fsm.state() == States::CREATE)
     {
-        // compute absolute coodinates
-        ImVec2 start = _w;
-        start.x += this->coords[0].x;
-        start.y += this->coords[0].y;
-
-        draw_list->AddRect(start, _m, IM_COL32(0, 255, 0, 255), 0.0, 0, 2.0);
+        draw_list->AddRect(start, _m, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, 2.0);
     }
     else if (this->fsm.state() == States::IDLE)
     {
-        // compute absolute coodinates
-        ImVec2 start = _w;
-        start.x += this->coords[0].x;
-        start.y += this->coords[0].y;
-
         ImVec2 end = _w;
         end.x += this->coords[1].x;
         end.y += this->coords[1].y;
 
-        draw_list->AddRect(start, end, IM_COL32(0, 255, 0, 255), 0.0, 0, 1.0);
+        draw_list->AddRect(start, end, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, 1.0);
     }
 }

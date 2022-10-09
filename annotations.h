@@ -49,14 +49,15 @@ class AnnotationInstance
 {
 public:
     // methods
-    AnnotationInstance(ImVec2 pos);    // init
-    void set_corner_start(ImVec2 pos); // set one corner coordinates
-    void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
-    void draw(void);                   // draw itself on picture
+    AnnotationInstance(ImVec2 pos, float color[4]); // init
+    void set_corner_start(ImVec2 pos);              // set one corner coordinates
+    void set_corner_end(ImVec2 pos);                // set the opposite end corder coordinates
+    void draw(void);                                // draw itself on picture
 
     // attributes
     ImVec2 coords[2];                                  // coordinates : x_start, y_start, x_end, y_end
     FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
+    uint8_t color_u8[4];                               // color
 
 private:
 };
@@ -66,17 +67,16 @@ class Annotation
 public:
     // methods
     Annotation(std::string label); // init
+    void update_color(void);       // change the color to all instances to the current color
 
     // attributes
-    std::string label;      // name of the annotation
-    char new_label[64];     // new (during edition) name of the annotation
-    annotation_type_t type; // type of the annotation (single point coordinates, rectangle area...)
-    float color[4];         // color to display square / point on the image
-    int shortcut;           // key to select annotation
-    bool selected;          // is annotation selected / active?
-
+    std::string label;                    // name of the annotation
+    char new_label[64];                   // new (during edition) name of the annotation
+    annotation_type_t type;               // type of the annotation (single point coordinates, rectangle area...)
+    float color[4];                       // color to display square / point on the image
+    int shortcut;                         // key to select annotation
+    bool selected;                        // is annotation selected / active?
     std::vector<AnnotationInstance> inst; // actual annotations on the current image
-
 private:
 };
 

@@ -13,8 +13,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-static void glDrawRectangle(void);
-
 AnnotationApp::AnnotationApp(void)
 {
     spdlog::info("Instanciation of AnnotationApp object.");
@@ -75,6 +73,7 @@ void AnnotationApp::ui_annotations_panel(void)
             if (ImGui::ColorEdit4(_unused_ids, this->annotations[n].color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel))
             {
                 update_json_flag = true;
+                this->annotations[n].update_color();
             }
 
             // label of the annotation
@@ -194,7 +193,9 @@ void AnnotationApp::json_read(void)
                 {
                     auto _vec = val["color"].get<std::vector<float>>();
                     for (int n = 0; n < 4; n++)
+                    {
                         _ann.color[n] = _vec[n];
+                    }
                 }
             }
 
@@ -319,7 +320,7 @@ void AnnotationApp::update_annotation_fsm(void)
         {
             if (this->annotations[n].selected)
             {
-                this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos));
+                this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos, this->annotations[n].color));
                 spdlog::info("New Annotation Instance <{}, type {}> : at position ({},{})",
                              this->annotations[n].label,
                              this->annotations[n].type,
@@ -437,45 +438,3 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
 
     return true;
 }
-
-void glDrawRectangle()
-{
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // Set line color
-    glColor3f(1.0, 1.0, 1.0);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
-
-    // Begin POLYGON coordinates
-    glBegin(GL_POLYGON);
-    // Provide coordinates
-    glVertex2f(-0.5, -0.5);
-    glVertex2f(-0.5, 0.5);
-    glVertex2f(0.5, 0.5);
-    glVertex2f(0.5, -0.5);
-    // End POLYGON coordinate
-    glEnd();
-
-    // Forces previously issued OpenGL commands to begin execution
-    glFlush();
-}
-
-// void AnnotationApp::json_read(void)
-// {
-//     /*
-//     Access when selecting a folder :
-//     - create file if it does not exist
-//     - parse header and populate annotations
-//      */
-
-//     // check for the annotation file and create it if needed
-//     // todo
-//     this->check_annotations_file();
-//     if (!this->annotations_file_exists)
-//     {
-//         this->fs.open(this->annotation_fname, std::ios::in | std::ios::out | std::ios::app);
-//     }
-
-//     // read header file
-// }
