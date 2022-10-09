@@ -24,17 +24,28 @@ AnnotationInstance::AnnotationInstance(ImVec2 pos)
 {
     // finite state machine instanciation
     this->fsm.add_transitions({
-        {STATE_CREATE, STATE_IDLE, 'a', nullptr, nullptr},
-        {STATE_IDLE, STATE_EDIT, 'b', nullptr, nullptr},
-        {STATE_EDIT, STATE_IDLE, 'c', nullptr, nullptr},
+        {States::CREATE, States::IDLE, "from_create_to_idle", nullptr, nullptr},
+        {States::IDLE, States::EDIT, "from_idle_to_edit", nullptr, nullptr},
+        {States::EDIT, States::IDLE, "from_edit_to_idle", nullptr, nullptr},
     });
 
     // position of the instance on the window
+    this->set_corner_start(pos);
+}
+
+void AnnotationInstance::set_corner_start(ImVec2 pos)
+{
     this->coords[0] = pos.x;
     this->coords[1] = pos.y;
 }
 
+void AnnotationInstance::set_corner_end(ImVec2 pos)
+{
+    this->coords[2] = pos.x;
+    this->coords[3] = pos.y;
+}
+
 void AnnotationInstance::draw(void)
 {
-    spdlog::debug("Drawing!");
+    // spdlog::debug("Drawing!");
 }

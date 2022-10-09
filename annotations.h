@@ -38,16 +38,25 @@ typedef enum
     STATE_EDIT,
 } draw_states_t;
 
+enum class States
+{
+    CREATE,
+    IDLE,
+    EDIT,
+};
+
 class AnnotationInstance
 {
 public:
     // methods
-    AnnotationInstance(ImVec2 pos); // init
-    void draw(void);                // draw itself on picture
+    AnnotationInstance(ImVec2 pos);    // init
+    void set_corner_start(ImVec2 pos); // set one corner coordinates
+    void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
+    void draw(void);                   // draw itself on picture
 
     // attributes
-    int coords[4];                         // coordinates : x_start, y_start, x_end, y_end
-    FSM::Fsm<int, STATE_CREATE, char> fsm; // state machine to handle rendering
+    int coords[4];                                     // coordinates : x_start, y_start, x_end, y_end
+    FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
 
 private:
 };

@@ -273,7 +273,8 @@ void AnnotationApp::ui_image_current()
         // - todo : draw all existing annotations
         // - todo : add new annotation process
         // - todo : edit existing annotation (select + change attributes)
-        this->update_annotation_fsm();
+        if (ImGui::IsItemHovered())
+            this->update_annotation_fsm();
     }
 }
 
@@ -282,41 +283,58 @@ void AnnotationApp::update_annotation_fsm(void)
     ImVec2 _w = ImGui::GetWindowPos();
     ImVec2 _m = ImGui::GetMousePos();
     ImVec2 cursor_pos = ImVec2(_m.x - _w.x, _m.y - _w.y);
-    ImGui::Text("Mouse in window: (%g, %g)", cursor_pos.x, cursor_pos.y);
 
-    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
+    bool create_new_instance_flag = true; // if true, will create a new instance of the active annotation
+    bool create_state_flag = false;       // if true, fsm is creating and rendering the annotation instance
+    int active_annotation = -1;           // track the id of the active annotation
+    int active_instance = -1;             // track the id of the active instance
+
+    // parse all states and instances to define the next FSM action
+    for (long unsigned n = 0; n < this->annotations.size(); n++)
     {
-        spdlog::debug("POUET");
-        // if all annotation instances are idle, add new one
-        bool create_new_instance_flag = true;
+        for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
+        {
+            // spdlog::debug("annotation {} : instance {} state = {})", this->annotations[n].label, m, this->annotations[n].inst[m].fsm.state());
+            if (this->annotations[n].inst[m].fsm.state() != States::IDLE)
+            {
+                create_new_instance_flag = false;
+                create_state_flag = false;
+            }
+
+            if (this->annotations[n].inst[m].fsm.state() == States::CREATE)
+            {
+                create_new_instance_flag = false;
+                create_state_flag = true;
+                active_annotation = n;
+                active_instance = m;
+                continue;
+            }
+        }
+    }
+
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_new_instance_flag == true))
+    {
         for (long unsigned n = 0; n < this->annotations.size(); n++)
         {
-            for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
+            if (this->annotations[n].selected)
             {
-                if (this->annotations[n].inst[m].fsm.state() != STATE_IDLE)
-                {
-                    create_new_instance_flag = false;
-                    continue;
-                }
+                this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos));
+                spdlog::info("New Annotation Instance <{}, type {}> : at position ({},{})",
+                             this->annotations[n].label,
+                             this->annotations[n].type,
+                             this->annotations[n].inst.back().coords[0],
+                             this->annotations[n].inst.back().coords[1]);
             }
         }
+    }
 
-        if (create_new_instance_flag)
-        {
-            for (long unsigned n = 0; n < this->annotations.size(); n++)
-            {
-                if (this->annotations[n].selected)
-                {
-                    this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos));
-                    spdlog::info("New Annotation Instance <{}, type {}> : ({},{}) in state {}",
-                                 this->annotations[n].label,
-                                 this->annotations[n].type,
-                                 this->annotations[n].inst.back().coords[0],
-                                 this->annotations[n].inst.back().coords[1],
-                                 this->annotations[n].inst.back().fsm.state());
-                }
-            }
-        }
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_state_flag == true))
+    {
+        // set the second corner coordinates
+        this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
+
+        // fsm : switch to idle state
+        this->annotations[active_annotation].inst[active_instance].fsm.execute("from_create_to_idle");
     }
 
     // todo : render all annotation instances
