@@ -35,17 +35,43 @@ AnnotationInstance::AnnotationInstance(ImVec2 pos)
 
 void AnnotationInstance::set_corner_start(ImVec2 pos)
 {
-    this->coords[0] = pos.x;
-    this->coords[1] = pos.y;
+    this->coords[0] = pos;
 }
 
 void AnnotationInstance::set_corner_end(ImVec2 pos)
 {
-    this->coords[2] = pos.x;
-    this->coords[3] = pos.y;
+    this->coords[1] = pos;
 }
 
 void AnnotationInstance::draw(void)
 {
-    // spdlog::debug("Drawing!");
+    // todo : color memed as IM_COL32 as well as floats
+    // todo : store those absolute coordinates for optimisation?
+
+    ImDrawList *draw_list = ImGui::GetWindowDrawList();
+    ImVec2 _w = ImGui::GetWindowPos();
+    ImVec2 _m = ImGui::GetMousePos();
+
+    if (this->fsm.state() == States::CREATE)
+    {
+        // compute absolute coodinates
+        ImVec2 start = _w;
+        start.x += this->coords[0].x;
+        start.y += this->coords[0].y;
+
+        draw_list->AddRect(start, _m, IM_COL32(0, 255, 0, 255), 0.0, 0, 2.0);
+    }
+    else if (this->fsm.state() == States::IDLE)
+    {
+        // compute absolute coodinates
+        ImVec2 start = _w;
+        start.x += this->coords[0].x;
+        start.y += this->coords[0].y;
+
+        ImVec2 end = _w;
+        end.x += this->coords[1].x;
+        end.y += this->coords[1].y;
+
+        draw_list->AddRect(start, end, IM_COL32(0, 255, 0, 255), 0.0, 0, 1.0);
+    }
 }

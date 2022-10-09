@@ -55,7 +55,7 @@ public:
     void draw(void);                   // draw itself on picture
 
     // attributes
-    int coords[4];                                     // coordinates : x_start, y_start, x_end, y_end
+    ImVec2 coords[2];                                  // coordinates : x_start, y_start, x_end, y_end
     FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
 
 private:

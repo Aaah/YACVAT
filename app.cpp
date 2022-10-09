@@ -252,6 +252,14 @@ void AnnotationApp::ui_image_current()
             spdlog::debug("Resizing factor : {}", this->scale);
         }
 
+        // draw image
+        ImGui::Image(
+            (void *)(intptr_t)this->current_image_texture,                     // image texture
+            ImVec2(current_image_width * scale, current_image_height * scale), // x and y dimensions (scaled)
+            ImVec2(0.0f, 0.0f),                                                // (x,y) coordinates start in [0.0, 1.0]
+            ImVec2(1.0f, 1.0f)                                                 // (x,y) coordinates end in [0.0, 1.0]
+        );
+
         // draw all annotations instances on the image
         for (long unsigned n = 0; n < this->annotations.size(); n++)
         {
@@ -260,14 +268,6 @@ void AnnotationApp::ui_image_current()
                 this->annotations[n].inst[m].draw();
             }
         }
-
-        // draw image
-        ImGui::Image(
-            (void *)(intptr_t)this->current_image_texture,                     // image texture
-            ImVec2(current_image_width * scale, current_image_height * scale), // x and y dimensions (scaled)
-            ImVec2(0.0f, 0.0f),                                                // (x,y) coordinates start in [0.0, 1.0]
-            ImVec2(1.0f, 1.0f)                                                 // (x,y) coordinates end in [0.0, 1.0]
-        );
 
         // fsm to handle drawing annotations
         // - todo : draw all existing annotations
@@ -312,6 +312,7 @@ void AnnotationApp::update_annotation_fsm(void)
         }
     }
 
+    // creating a new annotation instance
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_new_instance_flag == true))
     {
         for (long unsigned n = 0; n < this->annotations.size(); n++)
@@ -322,12 +323,13 @@ void AnnotationApp::update_annotation_fsm(void)
                 spdlog::info("New Annotation Instance <{}, type {}> : at position ({},{})",
                              this->annotations[n].label,
                              this->annotations[n].type,
-                             this->annotations[n].inst.back().coords[0],
-                             this->annotations[n].inst.back().coords[1]);
+                             this->annotations[n].inst.back().coords[0].x,
+                             this->annotations[n].inst.back().coords[0].y);
             }
         }
     }
 
+    // create state
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_state_flag == true))
     {
         // set the second corner coordinates
