@@ -39,6 +39,7 @@ private:
     std::vector<Annotation> annotations;  // list of annotations available
     std::fstream fs;                      // file pointer to the annotation file
     std::string annotation_fname;         // full path
+    std::string image_fname;              // currently opened image file name
     nlohmann::json json;                  // json data structure
 
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);

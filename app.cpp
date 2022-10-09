@@ -140,18 +140,25 @@ void AnnotationApp::json_write(void)
         fs.close();
     }
 
-    // create header
-    nlohmann::json new_header;
+    nlohmann::json json_data;
 
+    // header
     for (long unsigned n = 0; n < this->annotations.size(); n++)
     {
-        new_header["header"][this->annotations[n].label.c_str()] = {{"type", this->annotations[n].type},
-                                                                    {"color", this->annotations[n].color}};
+        json_data["header"][this->annotations[n].label.c_str()] = {{"type", this->annotations[n].type},
+                                                                   {"color", this->annotations[n].color}};
+    }
+
+    // annotation instances
+    // for all files OR for all annotations?
+    // todo : bind instances to images
+    for (long unsigned n = 0; n < this->annotations.size(); n++)
+    {
     }
 
     // flush file
     std::ofstream f(this->annotation_fname.c_str());
-    f << std::setw(4) << new_header << std::endl; // pretty json using setw(4)
+    f << std::setw(4) << json_data << std::endl; // pretty json using setw(4)
 }
 
 void AnnotationApp::json_read(void)
@@ -232,6 +239,7 @@ void AnnotationApp::ui_images_folder(void)
             IM_ASSERT(ret);
 
             this->scale = 0.0;
+            this->image_fname = e;
         }
         n++;
     }
@@ -320,15 +328,18 @@ void AnnotationApp::update_annotation_fsm(void)
         {
             if (this->annotations[n].selected)
             {
-                this->annotations[n].inst.push_back(AnnotationInstance(cursor_pos, this->annotations[n].color));
-                spdlog::info("New Annotation Instance <{}, type {}> : at position ({},{})",
+                this->annotations[n].inst.push_back(AnnotationInstance(this->image_fname, cursor_pos, this->annotations[n].color));
+                spdlog::info("New Annotation Instance <{}, type {}> on file {}: at position ({},{})",
                              this->annotations[n].label,
                              this->annotations[n].type,
+                             this->annotations[n].inst.back().img_fname,
                              this->annotations[n].inst.back().coords[0].x,
                              this->annotations[n].inst.back().coords[0].y);
             }
         }
     }
+
+    // todo : if create_statae_flag && escape : remove annotation and abort creation
 
     // create state
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_state_flag == true))
@@ -338,6 +349,9 @@ void AnnotationApp::update_annotation_fsm(void)
 
         // fsm : switch to idle state
         this->annotations[active_annotation].inst[active_instance].fsm.execute("from_create_to_idle");
+
+        // update json
+        this->json_write();
     }
 
     // todo : render all annotation instances

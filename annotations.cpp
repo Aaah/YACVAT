@@ -31,8 +31,12 @@ void Annotation::update_color(void)
 
 // -- INSTANCES
 
-AnnotationInstance::AnnotationInstance(ImVec2 pos, float color[4])
+AnnotationInstance::AnnotationInstance(std::string fname, ImVec2 pos, float color[4])
 {
+    // copy the image file owning the annotation
+    // todo : convert to filename only
+    this->img_fname = fname;
+
     // finite state machine instanciation
     this->fsm.add_transitions({
         {States::CREATE, States::IDLE, "from_create_to_idle", nullptr, nullptr},
@@ -46,6 +50,7 @@ AnnotationInstance::AnnotationInstance(ImVec2 pos, float color[4])
     // convert color
     for (int k = 0; k < 4; k++)
         this->color_u8[k] = color[k] * 255;
+
 }
 
 void AnnotationInstance::set_corner_start(ImVec2 pos)
