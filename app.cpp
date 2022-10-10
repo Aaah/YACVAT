@@ -142,18 +142,25 @@ void AnnotationApp::json_write(void)
 
     nlohmann::json json_data;
 
-    // header
     for (long unsigned n = 0; n < this->annotations.size(); n++)
     {
-        json_data["header"][this->annotations[n].label.c_str()] = {{"type", this->annotations[n].type},
+        // config
+        json_data[this->annotations[n].label.c_str()]["config"] = {{"type", this->annotations[n].type},
                                                                    {"color", this->annotations[n].color}};
-    }
 
-    // annotation instances
-    // for all files OR for all annotations?
-    // todo : bind instances to images
-    for (long unsigned n = 0; n < this->annotations.size(); n++)
-    {
+        // instances
+        json_data[this->annotations[n].label.c_str()]["instances"] = nlohmann::json::array();
+        for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
+        {
+            json_data[this->annotations[n].label.c_str()]["instances"].push_back(
+                nlohmann::json::object({
+                    {"file", this->annotations[n].inst[m].img_fname.c_str()}, // file
+                    {"x_start", this->annotations[n].inst[m].coords[0].x},    // start coordinates
+                    {"y_start", this->annotations[n].inst[m].coords[0].y},    // start coordinates
+                    {"x_end", this->annotations[n].inst[m].coords[1].x},      // end coordinates
+                    {"y_end", this->annotations[n].inst[m].coords[1].y}       // end coordinates
+                }));
+        }
     }
 
     // flush file
@@ -173,32 +180,30 @@ void AnnotationApp::json_read(void)
     std::ifstream f(this->annotation_fname.c_str());
     this->json = nlohmann::json::parse(f);
 
-    auto header = this->json["header"];
-    if (header != NULL)
+    // empty list of annotations
+    this->annotations.clear();
+
+    // extract annotations
+    for (nlohmann::json::iterator i = json.begin(); i != json.end(); ++i)
     {
-        // empty list of annotations
-        this->annotations.clear();
+        // create new annotation
+        Annotation _ann = Annotation(i.key());
+        auto config = i.value()["config"];
 
-        for (nlohmann::json::iterator i = header.begin(); i != header.end(); ++i)
+        if (config != NULL)
         {
-            // create new annotation
-            Annotation _ann = Annotation(i.key());
-
-            // get attributes
-            auto val = i.value();
-
-            for (nlohmann::json::iterator it = val.begin(); it != val.end(); ++it)
+            for (nlohmann::json::iterator j = config.begin(); j != config.end(); ++j)
             {
-                std::string _key = it.key();
+                std::string _key = j.key();
 
                 if (_key == "type")
                 {
-                    _ann.type = val["type"].get<annotation_type_t>();
+                    _ann.type = config["type"].get<annotation_type_t>();
                 }
 
                 if (_key == "color")
                 {
-                    auto _vec = val["color"].get<std::vector<float>>();
+                    auto _vec = config["color"].get<std::vector<float>>();
                     for (int n = 0; n < 4; n++)
                     {
                         _ann.color[n] = _vec[n];
@@ -210,9 +215,6 @@ void AnnotationApp::json_read(void)
             this->annotations.push_back(_ann);
         }
     }
-
-    // compose annotations from the header
-    // get current image info
 }
 
 void AnnotationApp::ui_images_folder(void)
