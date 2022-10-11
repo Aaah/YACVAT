@@ -188,8 +188,9 @@ void AnnotationApp::json_read(void)
     {
         // create new annotation
         Annotation _ann = Annotation(i.key());
-        auto config = i.value()["config"];
 
+        // config
+        auto config = i.value()["config"];
         if (config != NULL)
         {
             for (nlohmann::json::iterator j = config.begin(); j != config.end(); ++j)
@@ -214,7 +215,42 @@ void AnnotationApp::json_read(void)
             // add annotation to the list of valid annotations
             this->annotations.push_back(_ann);
         }
+
+        // instances
+        auto insts = i.value()["instances"];
+        if (insts != NULL)
+        {
+            for (nlohmann::json::iterator j = insts.begin(); j != insts.end(); ++j)
+            {
+                // create a new instance
+                AnnotationInstance _inst = AnnotationInstance();
+
+                // retrieve file name
+                auto val = j.value();
+                _inst.img_fname = val["file"].get<std::string>();
+
+                // retrieve corner positions of the instance
+                float x_start = val["x_start"].get<float>();
+                float y_start = val["y_start"].get<float>();
+                float x_end = val["x_end"].get<float>();
+                float y_end = val["y_end"].get<float>();
+                _inst.set_corner_start(ImVec2(x_start, y_start));
+                _inst.set_corner_end(ImVec2(x_end, y_end));
+
+                // retrieve color
+                for (int k = 0; k < 4; k++)
+                    _inst.color_u8[k] = this->annotations.back().color[k] * 255;
+
+                // switch state to idle
+                _inst.fsm.execute("from_create_to_idle");
+
+                // push annotation instance
+                this->annotations.back().inst.push_back(_inst);
+            }
+        }
     }
+
+    // todo : parse annotations instances
 }
 
 void AnnotationApp::ui_images_folder(void)
@@ -276,7 +312,8 @@ void AnnotationApp::ui_image_current()
         {
             for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
             {
-                this->annotations[n].inst[m].draw();
+                if (this->annotations[n].inst[m].img_fname == this->image_fname)
+                    this->annotations[n].inst[m].draw();
             }
         }
 

@@ -30,6 +30,15 @@ void Annotation::update_color(void)
 }
 
 // -- INSTANCES
+AnnotationInstance::AnnotationInstance(void)
+{
+    // finite state machine instanciation
+    this->fsm.add_transitions({
+        {States::CREATE, States::IDLE, "from_create_to_idle", nullptr, nullptr},
+        {States::IDLE, States::EDIT, "from_idle_to_edit", nullptr, nullptr},
+        {States::EDIT, States::IDLE, "from_edit_to_idle", nullptr, nullptr},
+    });
+}
 
 AnnotationInstance::AnnotationInstance(std::string fname, ImVec2 pos, float color[4])
 {
@@ -50,7 +59,6 @@ AnnotationInstance::AnnotationInstance(std::string fname, ImVec2 pos, float colo
     // convert color
     for (int k = 0; k < 4; k++)
         this->color_u8[k] = color[k] * 255;
-
 }
 
 void AnnotationInstance::set_corner_start(ImVec2 pos)

@@ -49,6 +49,7 @@ class AnnotationInstance
 {
 public:
     // methods
+    AnnotationInstance(void);                                          // init
     AnnotationInstance(std::string fname, ImVec2 pos, float color[4]); // init
     void set_corner_start(ImVec2 pos);                                 // set one corner coordinates
     void set_corner_end(ImVec2 pos);                                   // set the opposite end corder coordinates
