@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(yacvat VERSION 0.1.0)
 
+# todo : set version in header file and parse it
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
+set(OpenGL_GL_PREFERENCE LEGACY)
 
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -27,12 +29,13 @@ target_include_directories(yacvat PRIVATE
     lib/ImGuiFileDialog/ 
     lib/spdlog/include/
     lib/stb/ 
-    lib/json/single_include/
+    lib/json/include/
     lib/fsm)
 
 add_subdirectory(lib/spdlog)
+add_subdirectory(lib/json)
 
-target_link_libraries(yacvat spdlog -lpthread ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(yacvat spdlog nlohmann_json -lpthread ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES})
 
 # compile options
 target_compile_options(yacvat PRIVATE -std=c++11 -g -Wall -Wformat)
