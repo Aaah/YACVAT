@@ -36,7 +36,7 @@ int ImGui_AnnotationTool(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Annotations Menu"))
+        if (ImGui::BeginMenu("Images Menu"))
         {
             if (ImGui::MenuItem("Open folder"))
                 app.open_images_folder_flag = true;
@@ -76,11 +76,11 @@ int ImGui_AnnotationTool(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Annotations Menu"))
+        if (ImGui::BeginMenu("Annotations"))
         {
-            if (ImGui::MenuItem("Open/create file"))
-            {
-            }
+            // if (ImGui::MenuItem("Open/create file"))
+            // {
+            // }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
