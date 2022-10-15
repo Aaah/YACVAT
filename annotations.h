@@ -45,6 +45,18 @@ enum class States
     EDIT,
 };
 
+class Rectangle
+{
+public:
+    Rectangle(ImVec2 start, ImVec2 end);
+    bool intersect(Rectangle rect);
+    bool inside(ImVec2 point);
+
+private:
+    ImVec2 center;
+    ImVec2 span;
+};
+
 class AnnotationInstance
 {
 public:

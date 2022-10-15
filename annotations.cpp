@@ -95,6 +95,52 @@ void AnnotationInstance::draw(void)
         end.x += this->coords[1].x;
         end.y += this->coords[1].y;
 
-        draw_list->AddRect(start, end, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, 1.0);
+        // change thickness if hovered
+        // todo : relocate this code to a logic update -> hovered
+        float _thickness = 1.0;
+        float delta = 5;
+        Rectangle outer_rect = Rectangle(ImVec2(start.x - delta, start.y - delta), ImVec2(end.x + delta, end.y + delta));
+        Rectangle inner_rect = Rectangle(ImVec2(start.x + delta, start.y + delta), ImVec2(end.x - delta, end.y - delta));
+
+        if (outer_rect.inside(_m) && !inner_rect.inside(_m))
+        {
+            _thickness = 2.0;
+        }
+
+        draw_list->AddRect(start, end, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
     }
+}
+
+Rectangle::Rectangle(ImVec2 start, ImVec2 end)
+{
+    this->span.x = std::abs(end.x - start.x);
+    this->span.y = std::abs(end.y - start.y);
+
+    if (start.x < end.x)
+        this->center.x = start.x + 0.5 * this->span.x;
+    else
+        this->center.x = end.x + 0.5 * this->span.x;
+
+    if (start.y < end.y)
+        this->center.y = start.y + 0.5 * this->span.y;
+    else
+        this->center.y = end.y + 0.5 * this->span.y;
+}
+
+bool Rectangle::intersect(Rectangle rect)
+{
+    if ((std::abs(center.x - rect.center.x) < 0.5 * (span.x + rect.span.x)) && (std::abs(center.y - rect.center.y) < 0.5 * (span.y + rect.span.y)))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Rectangle::inside(ImVec2 point)
+{
+    if ((2.0 * std::abs(point.x - center.x) < span.x) && (2.0 * std::abs(point.y - center.y) < span.y))
+    {
+        return true;
+    }
+    return false;
 }
