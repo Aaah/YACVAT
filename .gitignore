@@ -1,3 +1,4 @@
 *.o
 !gl3w.o
 /data
+/build

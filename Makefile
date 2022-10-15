@@ -15,7 +15,7 @@
 #CXX = clang++
 
 EXE = tool
-IMGUI_DIR = /home/remy/Dev/git-imgui
+IMGUI_DIR = lib/imgui
 LIBIMGUIFILEDIALOG = lib/ImGuiFileDialog
 LIBSPDLOG = lib/spdlog
 LIBSTB = lib/stb
@@ -29,7 +29,6 @@ SOURCES += $(LIBIMGUIFILEDIALOG)/ImGuiFileDialog.cpp
 SOURCES += $(LIBSPDLOG)/src/spdlog.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
-LINUX_GL_LIBS = -lGL
 
 CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends -I$(LIBIMGUIFILEDIALOG) -I$(LIBSPDLOG)/include -I$(LIBSTB) -I$(LIBJSON)/single_include -I$(LIBFSM)
 CXXFLAGS += -g -Wall -Wformat -DSPDLOG_COMPILED_LIB

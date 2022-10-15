@@ -155,10 +155,10 @@ void AnnotationApp::json_write(void)
             json_data[this->annotations[n].label.c_str()]["instances"].push_back(
                 nlohmann::json::object({
                     {"file", this->annotations[n].inst[m].img_fname.c_str()}, // file
-                    {"x_start", this->annotations[n].inst[m].coords[0].x},    // start coordinates
-                    {"y_start", this->annotations[n].inst[m].coords[0].y},    // start coordinates
-                    {"x_end", this->annotations[n].inst[m].coords[1].x},      // end coordinates
-                    {"y_end", this->annotations[n].inst[m].coords[1].y}       // end coordinates
+                    {"x_start", this->annotations[n].inst[m].coords[0].x},    // x start coordinates
+                    {"y_start", this->annotations[n].inst[m].coords[0].y},    // y start coordinates
+                    {"x_end", this->annotations[n].inst[m].coords[1].x},      // x end coordinates
+                    {"y_end", this->annotations[n].inst[m].coords[1].y}       // y end coordinates
                 }));
         }
     }
@@ -230,10 +230,11 @@ void AnnotationApp::json_read(void)
                 _inst.img_fname = val["file"].get<std::string>();
 
                 // retrieve corner positions of the instance
-                float x_start = val["x_start"].get<float>();
-                float y_start = val["y_start"].get<float>();
-                float x_end = val["x_end"].get<float>();
-                float y_end = val["y_end"].get<float>();
+                // todo : handle scale, dunno why it's not working
+                float x_start = val["x_start"].get<float>(); // * this->scale;
+                float y_start = val["y_start"].get<float>(); // * this->scale;
+                float x_end = val["x_end"].get<float>();     // * this->scale;
+                float y_end = val["y_end"].get<float>();     // * this->scale;
                 _inst.set_corner_start(ImVec2(x_start, y_start));
                 _inst.set_corner_end(ImVec2(x_end, y_end));
 
