@@ -319,9 +319,6 @@ void AnnotationApp::ui_image_current()
         }
 
         // fsm to handle drawing annotations
-        // - todo : draw all existing annotations
-        // - todo : add new annotation process
-        // - todo : edit existing annotation (select + change attributes)
         if (ImGui::IsItemHovered())
             this->update_annotation_fsm();
     }
@@ -391,10 +388,13 @@ void AnnotationApp::update_annotation_fsm(void)
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_state_flag == true))
     {
         // set the second corner coordinates
+        // todo : fix set corner end
         this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
 
         // fsm : switch to idle state
         this->annotations[active_annotation].inst[active_instance].fsm.execute("from_create_to_idle");
+
+        // todo : update state
 
         // update json
         this->json_write();

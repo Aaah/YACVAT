@@ -60,7 +60,10 @@ void AnnotationInstance::set_corner_start(ImVec2 pos)
 
 void AnnotationInstance::set_corner_end(ImVec2 pos)
 {
-    this->coords[1] = pos;
+    coords[1].x = std::max(coords[0].x, pos.x);
+    coords[1].y = std::max(coords[0].y, pos.y);
+    coords[0].x = std::min(coords[0].x, pos.x);
+    coords[0].y = std::min(coords[0].y, pos.y);
 }
 
 void AnnotationInstance::draw(void)
@@ -105,7 +108,6 @@ void AnnotationInstance::draw(void)
 
 Rectangle::Rectangle(void)
 {
-    
 }
 
 Rectangle::Rectangle(ImVec2 start, ImVec2 end)
