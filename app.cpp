@@ -368,7 +368,13 @@ void AnnotationApp::update_annotation_fsm(void)
         {
             if (this->annotations[n].selected)
             {
-                this->annotations[n].inst.push_back(AnnotationInstance(this->image_fname, cursor_pos, this->annotations[n].color));
+                AnnotationInstance _ann = AnnotationInstance();
+                _ann.set_fname(this->image_fname);
+                _ann.set_corner_start(cursor_pos);
+                _ann.set_color(this->annotations[n].color);
+
+                this->annotations[n].inst.push_back(_ann);
+                
                 spdlog::info("New Annotation Instance <{}, type {}> on file {}: at position ({},{})",
                              this->annotations[n].label,
                              this->annotations[n].type,

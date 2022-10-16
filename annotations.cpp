@@ -24,8 +24,7 @@ void Annotation::update_color(void)
 {
     for (long unsigned int n = 0; n < this->inst.size(); n++)
     {
-        for (int k = 0; k < 4; k++)
-            this->inst[n].color_u8[k] = this->color[k] * 255;
+        this->inst[n].set_color(this->color);
     }
 }
 
@@ -38,25 +37,18 @@ AnnotationInstance::AnnotationInstance(void)
         {States::IDLE, States::EDIT, "from_idle_to_edit", nullptr, nullptr},
         {States::EDIT, States::IDLE, "from_edit_to_idle", nullptr, nullptr},
     });
+
+    this->outer_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
+    this->inner_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
 }
 
-AnnotationInstance::AnnotationInstance(std::string fname, ImVec2 pos, float color[4])
+void AnnotationInstance::set_fname(std::string fname)
 {
-    // copy the image file owning the annotation
-    // todo : convert to filename only
     this->img_fname = fname;
+}
 
-    // finite state machine instanciation
-    this->fsm.add_transitions({
-        {States::CREATE, States::IDLE, "from_create_to_idle", nullptr, nullptr},
-        {States::IDLE, States::EDIT, "from_idle_to_edit", nullptr, nullptr},
-        {States::EDIT, States::IDLE, "from_edit_to_idle", nullptr, nullptr},
-    });
-
-    // position of the instance on the window
-    this->set_corner_start(pos);
-
-    // convert color
+void AnnotationInstance::set_color(float color[4])
+{
     for (int k = 0; k < 4; k++)
         this->color_u8[k] = color[k] * 255;
 }
@@ -109,6 +101,11 @@ void AnnotationInstance::draw(void)
 
         draw_list->AddRect(start, end, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
     }
+}
+
+Rectangle::Rectangle(void)
+{
+    
 }
 
 Rectangle::Rectangle(ImVec2 start, ImVec2 end)

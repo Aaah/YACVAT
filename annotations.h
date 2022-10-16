@@ -48,6 +48,7 @@ enum class States
 class Rectangle
 {
 public:
+    Rectangle();
     Rectangle(ImVec2 start, ImVec2 end);
     bool intersect(Rectangle rect);
     bool inside(ImVec2 point);
@@ -61,18 +62,22 @@ class AnnotationInstance
 {
 public:
     // methods
-    AnnotationInstance(void);                                          // init
-    AnnotationInstance(std::string fname, ImVec2 pos, float color[4]); // init
-    void set_corner_start(ImVec2 pos);                                 // set one corner coordinates
-    void set_corner_end(ImVec2 pos);                                   // set the opposite end corder coordinates
-    void draw(void);                                                   // draw itself on picture
+    AnnotationInstance(void);          // init
+    void set_fname(std::string fname); // set file name
+    void set_color(float color[4]);    // set color
+    void set_corner_start(ImVec2 pos); // set one corner coordinates
+    void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
+    void draw(void);                   // draw itself on picture
 
     // attributes
     ImVec2 coords[2];                                  // coordinates : x_start, y_start, x_end, y_end
     FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
     uint8_t color_u8[4];                               // color
     std::string img_fname;                             // image file containing the annotation instance
+
 private:
+    Rectangle outer_rect; // bounding box to detect mouse hover
+    Rectangle inner_rect; // bounding box to detect mouse hover
 };
 
 class Annotation
