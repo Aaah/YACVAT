@@ -41,6 +41,7 @@ AnnotationInstance::AnnotationInstance(void)
     this->outer_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
     this->inner_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
     this->delta = 10.0;
+    this->selected = false;
 }
 
 void AnnotationInstance::update_bounding_box(void)
@@ -51,8 +52,8 @@ void AnnotationInstance::update_bounding_box(void)
     this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
 
     this->inner_rect.center = this->outer_rect.center;
-    this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
-    this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
+    this->inner_rect.span.x = std::max(1, (int) std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
+    this->inner_rect.span.y = std::max(1, (int) std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
 }
 
 void AnnotationInstance::set_fname(std::string fname)

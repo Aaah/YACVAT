@@ -117,15 +117,62 @@ void AnnotationApp::ui_annotations_panel(void)
         update_json_flag = true;
     }
 
+    // freeze current configuration and start labeling
+    ImGui::Separator();
+
+    // list annotations in the current image
+    if (ImGui::BeginTable("table_annotations_inst", 2, flags))
+    {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableHeadersRow();
+
+        static char _unused_ids[64] = "";
+
+        for (long unsigned int n = 0; n < this->annotations.size(); n++)
+        {
+            for (long unsigned int m = 0; m < this->annotations[n].inst.size(); m++)
+            {
+                if (this->annotations[n].inst[m].img_fname == this->image_fname)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    sprintf(_unused_ids, "%s-%ld##labelinst", this->annotations[n].label.c_str(), m);
+                    if (ImGui::Selectable(_unused_ids, &this->annotations[n].inst[m].selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
+                    {
+                        spdlog::debug("selecting : {} -> {}", m, this->annotations[n].inst[m].selected);
+
+                        // only 1 selection allowed
+                        if (this->annotations[n].inst[m].selected)
+                        {
+                            for (long unsigned int kk = 0; kk < this->annotations[n].inst.size(); kk++)
+                            {
+                                if (kk != m)
+                                {
+                                    this->annotations[n].inst[kk].selected = false;
+                                }
+                            }
+                        }
+                    }
+
+                    ImGui::TableSetColumnIndex(1);
+                    sprintf(_unused_ids, "-##delbuttontinst%ldx%ld", n, m);
+                    if (ImGui::Button(_unused_ids))
+                    {
+                        this->annotations[n].inst.erase(this->annotations[n].inst.begin() + m);
+                        update_json_flag = true;
+                    }
+                }
+            }
+        }
+
+        ImGui::EndTable();
+    }
+
     if (update_json_flag == true)
     {
         this->json_write();
     }
-
-    // freeze current configuration and start labeling
-    ImGui::Separator();
-
-    // todo list annotations in the current image
 }
 
 void AnnotationApp::json_write(void)

@@ -75,6 +75,7 @@ public:
     FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
     uint8_t color_u8[4];                               // color
     std::string img_fname;                             // image file containing the annotation instance
+    bool selected;                                     // is the instance being edited
 
 private:
     int delta;            //
