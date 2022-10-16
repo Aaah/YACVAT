@@ -244,6 +244,7 @@ void AnnotationApp::json_read(void)
 
                 // switch state to idle
                 _inst.fsm.execute("from_create_to_idle");
+                _inst.update_bounding_box();
 
                 // push annotation instance
                 this->annotations.back().inst.push_back(_inst);
@@ -371,7 +372,7 @@ void AnnotationApp::update_annotation_fsm(void)
                 _ann.set_color(this->annotations[n].color);
 
                 this->annotations[n].inst.push_back(_ann);
-                
+
                 spdlog::info("New Annotation Instance <{}, type {}> on file {}: at position ({},{})",
                              this->annotations[n].label,
                              this->annotations[n].type,
@@ -394,7 +395,8 @@ void AnnotationApp::update_annotation_fsm(void)
         // fsm : switch to idle state
         this->annotations[active_annotation].inst[active_instance].fsm.execute("from_create_to_idle");
 
-        // todo : update state
+        // todo : update state (bounding box)
+        this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
         // update json
         this->json_write();

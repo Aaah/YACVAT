@@ -52,10 +52,10 @@ public:
     Rectangle(ImVec2 start, ImVec2 end);
     bool intersect(Rectangle rect);
     bool inside(ImVec2 point);
-
-private:
     ImVec2 center;
     ImVec2 span;
+
+private:
 };
 
 class AnnotationInstance
@@ -68,6 +68,7 @@ public:
     void set_corner_start(ImVec2 pos); // set one corner coordinates
     void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
     void draw(void);                   // draw itself on picture
+    void update_bounding_box(void);    // update inner and outer hover box;
 
     // attributes
     ImVec2 coords[2];                                  // coordinates : x_start, y_start, x_end, y_end
@@ -76,6 +77,7 @@ public:
     std::string img_fname;                             // image file containing the annotation instance
 
 private:
+    int delta;            //
     Rectangle outer_rect; // bounding box to detect mouse hover
     Rectangle inner_rect; // bounding box to detect mouse hover
 };

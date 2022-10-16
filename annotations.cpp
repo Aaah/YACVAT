@@ -40,6 +40,19 @@ AnnotationInstance::AnnotationInstance(void)
 
     this->outer_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
     this->inner_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
+    this->delta = 10.0;
+}
+
+void AnnotationInstance::update_bounding_box(void)
+{
+    this->outer_rect.center.x = std::abs(this->coords[1].x + this->coords[0].x) / 2.0;
+    this->outer_rect.center.y = std::abs(this->coords[1].y + this->coords[0].y) / 2.0;
+    this->outer_rect.span.x = std::abs(this->coords[1].x - this->coords[0].x) + this->delta;
+    this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
+
+    this->inner_rect.center = this->outer_rect.center;
+    this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
+    this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
 }
 
 void AnnotationInstance::set_fname(std::string fname)
@@ -86,18 +99,15 @@ void AnnotationInstance::draw(void)
     }
     else if (this->fsm.state() == States::IDLE)
     {
-        ImVec2 end = _w;
-        end.x += this->coords[1].x;
-        end.y += this->coords[1].y;
+        // position on screen
+        ImVec2 end = ImVec2(this->coords[1].x + _w.x, this->coords[1].y + _w.y);
+
+        // position on image
+        ImVec2 _pos = ImVec2(_m.x - _w.x, _m.y - _w.y);
 
         // change thickness if hovered
-        // todo : relocate this code to a logic update -> hovered
         float _thickness = 1.0;
-        float delta = 5;
-        Rectangle outer_rect = Rectangle(ImVec2(start.x - delta, start.y - delta), ImVec2(end.x + delta, end.y + delta));
-        Rectangle inner_rect = Rectangle(ImVec2(start.x + delta, start.y + delta), ImVec2(end.x - delta, end.y - delta));
-
-        if (outer_rect.inside(_m) && !inner_rect.inside(_m))
+        if (outer_rect.inside(_pos) && !inner_rect.inside(_pos))
         {
             _thickness = 2.0;
         }
