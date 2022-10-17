@@ -152,6 +152,9 @@ void AnnotationInstance::update(void)
             }
 
             // todo : edition logic
+            // todo : simplify use of coords / vertex... redundant!
+            // todo : on mouse drag inside, move coords + vertex
+            // todo : edit single side on hover + drag + edge detection 
         }
         else if (this->status_fsm.state() == StatusStates::CANCEL)
         {
