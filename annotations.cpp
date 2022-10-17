@@ -145,7 +145,7 @@ void AnnotationInstance::update(void)
         else if (this->status_fsm.state() == StatusStates::EDIT)
         {
             // switch to idle mode
-            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE))
+            if (ImGui::IsKeyPressed(526) || (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE)))
             {
                 this->status_fsm.execute("from_edit_to_cancel");
                 spdlog::debug("EDIT : cancelling current action");
