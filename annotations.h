@@ -30,19 +30,18 @@ typedef enum
     ANNOTATION_TYPE_AREA,
 } annotation_type_t;
 
-// states used to handle rendering of annotations instances
-typedef enum
-{
-    STATE_CREATE = 1,
-    STATE_IDLE,
-    STATE_EDIT,
-} draw_states_t;
-
-enum class States
+enum class StatusStates
 {
     CREATE,
     IDLE,
     EDIT,
+};
+
+enum class HoverStates
+{
+    INSIDE,
+    OUTSIDE,
+    HOVER,
 };
 
 class Rectangle
@@ -68,19 +67,24 @@ public:
     void set_corner_start(ImVec2 pos); // set one corner coordinates
     void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
     void draw(void);                   // draw itself on picture
+    void update(void);                 // update fsm
     void update_bounding_box(void);    // update inner and outer hover box;
 
     // attributes
-    ImVec2 coords[2];                                  // coordinates : x_start, y_start, x_end, y_end
-    FSM::Fsm<States, States::CREATE, std::string> fsm; // state machine to handle rendering
-    uint8_t color_u8[4];                               // color
-    std::string img_fname;                             // image file containing the annotation instance
-    bool selected;                                     // is the instance being edited
+    ImVec2 coords[2];                                                     // coordinates : x_start, y_start, x_end, y_end
+    FSM::Fsm<StatusStates, StatusStates::CREATE, std::string> status_fsm; // state machine to handle rendering
+    FSM::Fsm<HoverStates, HoverStates::HOVER, std::string> hover_fsm;     // state machine to handle logic in edit mode
+    uint8_t color_u8[4];                                                  // color
+    std::string img_fname;                                                // image file containing the annotation instance
+    bool selected;                                                        // is the instance being edited
 
 private:
     int delta;            //
     Rectangle outer_rect; // bounding box to detect mouse hover
     Rectangle inner_rect; // bounding box to detect mouse hover
+    ImVec2 start_vertex;
+    ImVec2 end_vertex;
+    ImVec2 mouse_on_image;
 };
 
 class Annotation

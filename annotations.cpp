@@ -31,11 +31,19 @@ void Annotation::update_color(void)
 // -- INSTANCES
 AnnotationInstance::AnnotationInstance(void)
 {
-    // finite state machine instanciation
-    this->fsm.add_transitions({
-        {States::CREATE, States::IDLE, "from_create_to_idle", nullptr, nullptr},
-        {States::IDLE, States::EDIT, "from_idle_to_edit", nullptr, nullptr},
-        {States::EDIT, States::IDLE, "from_edit_to_idle", nullptr, nullptr},
+    // finite state machine : status
+    this->status_fsm.add_transitions({
+        {StatusStates::CREATE, StatusStates::IDLE, "from_create_to_idle", nullptr, nullptr},
+        {StatusStates::IDLE, StatusStates::EDIT, "from_idle_to_edit", nullptr, nullptr},
+        {StatusStates::EDIT, StatusStates::IDLE, "from_edit_to_idle", nullptr, nullptr},
+    });
+
+    // finite state machine : mouse position to the box
+    this->hover_fsm.add_transitions({
+        {HoverStates::HOVER, HoverStates::INSIDE, "from_hover_to_inside", nullptr, nullptr},
+        {HoverStates::HOVER, HoverStates::OUTSIDE, "from_hover_to_outside", nullptr, nullptr},
+        {HoverStates::INSIDE, HoverStates::HOVER, "from_inside_to_hover", nullptr, nullptr},
+        {HoverStates::OUTSIDE, HoverStates::HOVER, "from_outside_to_hover", nullptr, nullptr},
     });
 
     this->outer_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
@@ -52,8 +60,8 @@ void AnnotationInstance::update_bounding_box(void)
     this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
 
     this->inner_rect.center = this->outer_rect.center;
-    this->inner_rect.span.x = std::max(1, (int) std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
-    this->inner_rect.span.y = std::max(1, (int) std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
+    this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
+    this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
 }
 
 void AnnotationInstance::set_fname(std::string fname)
@@ -80,40 +88,97 @@ void AnnotationInstance::set_corner_end(ImVec2 pos)
     coords[0].y = std::min(coords[0].y, pos.y);
 }
 
-void AnnotationInstance::draw(void)
+void AnnotationInstance::update(void)
 {
-    // todo : color memed as IM_COL32 as well as floats
-    // todo : store those absolute coordinates for optimisation?
+    // goal : change states
+    // define start & end vec2 to draw
 
-    ImDrawList *draw_list = ImGui::GetWindowDrawList();
     ImVec2 _w = ImGui::GetWindowPos();
     ImVec2 _m = ImGui::GetMousePos();
 
-    // compute absolute coodinates
-    ImVec2 start = _w;
-    start.x += this->coords[0].x;
-    start.y += this->coords[0].y;
+    // mouse position on image
+    this->mouse_on_image = ImVec2(_m.x - _w.x, _m.y - _w.y);
 
-    if (this->fsm.state() == States::CREATE)
+    // compute absolute coodinates of the start vertex
+    this->start_vertex = ImVec2(_w.x + this->coords[0].x, _w.y + this->coords[0].y);
+
+    // update HOVER fsm
+    if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(this->mouse_on_image))
     {
-        draw_list->AddRect(start, _m, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, 2.0);
+        this->hover_fsm.execute("from_hover_to_outside");
     }
-    else if (this->fsm.state() == States::IDLE)
+    else if ((this->hover_fsm.state() == HoverStates::HOVER) && inner_rect.inside(this->mouse_on_image))
     {
-        // position on screen
-        ImVec2 end = ImVec2(this->coords[1].x + _w.x, this->coords[1].y + _w.y);
+        this->hover_fsm.execute("from_hover_to_inside");
+    }
+    else if ((this->hover_fsm.state() == HoverStates::OUTSIDE) && outer_rect.inside(this->mouse_on_image))
+    {
+        this->hover_fsm.execute("from_outside_to_hover");
+    }
+    else if ((this->hover_fsm.state() == HoverStates::INSIDE) && !inner_rect.inside(this->mouse_on_image))
+    {
+        this->hover_fsm.execute("from_inside_to_hover");
+    }
 
-        // position on image
-        ImVec2 _pos = ImVec2(_m.x - _w.x, _m.y - _w.y);
+    // update status fsm
+    if (this->status_fsm.state() == StatusStates::CREATE)
+    {
+        // the end vertex is the mouse position on screen
+        this->end_vertex = _m;
+    }
+    else
+    {
+        // position on screen of the end vertex
+        this->end_vertex = ImVec2(this->coords[1].x + _w.x, this->coords[1].y + _w.y);
 
-        // change thickness if hovered
-        float _thickness = 1.0;
-        if (outer_rect.inside(_pos) && !inner_rect.inside(_pos))
+        if (this->status_fsm.state() == StatusStates::IDLE)
         {
+            // switch to edit mode
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::HOVER))
+            {
+                this->status_fsm.execute("from_idle_to_edit");
+            }
+        }
+        else if (this->status_fsm.state() == StatusStates::EDIT)
+        {
+            // switch to idle mode
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE))
+            {
+                this->status_fsm.execute("from_edit_to_idle");
+            }
+
+            // todo : edition logic
+        }
+    }
+}
+
+void AnnotationInstance::draw(void)
+{
+    ImDrawList *draw_list = ImGui::GetWindowDrawList();
+    float _thickness = 1.0;
+    if (this->status_fsm.state() == StatusStates::CREATE)
+    {
+        // draw the rectangle all the way to the mouse cursor
+        draw_list->AddRect(this->start_vertex, ImGui::GetMousePos(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
+    }
+    else
+    {
+        // update FSM
+        if (this->status_fsm.state() == StatusStates::IDLE)
+        {
+            // change thickness if hovered
+            if (this->hover_fsm.state() == HoverStates::HOVER)
+            {
+                _thickness = 2.0;
+            }
+        }
+        else if (this->status_fsm.state() == StatusStates::EDIT)
+        {
+            // increase thickness in this mode
             _thickness = 2.0;
         }
 
-        draw_list->AddRect(start, end, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
+        draw_list->AddRect(this->start_vertex, this->end_vertex, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
     }
 }
 

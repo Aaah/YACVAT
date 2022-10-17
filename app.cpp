@@ -290,7 +290,7 @@ void AnnotationApp::json_read(void)
                     _inst.color_u8[k] = this->annotations.back().color[k] * 255;
 
                 // switch state to idle
-                _inst.fsm.execute("from_create_to_idle");
+                _inst.status_fsm.execute("from_create_to_idle");
                 _inst.update_bounding_box();
 
                 // push annotation instance
@@ -362,7 +362,13 @@ void AnnotationApp::ui_image_current()
             for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
             {
                 if (this->annotations[n].inst[m].img_fname == this->image_fname)
+                {
+                    // update logic
+                    this->annotations[n].inst[m].update();
+
+                    // draw on screen
                     this->annotations[n].inst[m].draw();
+                }
             }
         }
 
@@ -389,13 +395,13 @@ void AnnotationApp::update_annotation_fsm(void)
         for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
         {
             // spdlog::debug("annotation {} : instance {} state = {})", this->annotations[n].label, m, this->annotations[n].inst[m].fsm.state());
-            if (this->annotations[n].inst[m].fsm.state() != States::IDLE)
+            if (this->annotations[n].inst[m].status_fsm.state() != StatusStates::IDLE)
             {
                 create_new_instance_flag = false;
                 create_state_flag = false;
             }
 
-            if (this->annotations[n].inst[m].fsm.state() == States::CREATE)
+            if (this->annotations[n].inst[m].status_fsm.state() == StatusStates::CREATE)
             {
                 create_new_instance_flag = false;
                 create_state_flag = true;
@@ -440,7 +446,7 @@ void AnnotationApp::update_annotation_fsm(void)
         this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
 
         // fsm : switch to idle state
-        this->annotations[active_annotation].inst[active_instance].fsm.execute("from_create_to_idle");
+        this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
 
         // todo : update state (bounding box)
         this->annotations[active_annotation].inst[active_instance].update_bounding_box();
