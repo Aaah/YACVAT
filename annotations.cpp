@@ -34,8 +34,11 @@ AnnotationInstance::AnnotationInstance(void)
     // finite state machine : status
     this->status_fsm.add_transitions({
         {StatusStates::CREATE, StatusStates::IDLE, "from_create_to_idle", nullptr, nullptr},
+        {StatusStates::CREATE, StatusStates::CANCEL, "from_create_to_cancel", nullptr, nullptr},
         {StatusStates::IDLE, StatusStates::EDIT, "from_idle_to_edit", nullptr, nullptr},
         {StatusStates::EDIT, StatusStates::IDLE, "from_edit_to_idle", nullptr, nullptr},
+        {StatusStates::EDIT, StatusStates::CANCEL, "from_edit_to_cancel", nullptr, nullptr},
+        {StatusStates::CANCEL, StatusStates::IDLE, "from_cancel_to_idle", nullptr, nullptr},
     });
 
     // finite state machine : mouse position to the box
@@ -137,6 +140,7 @@ void AnnotationInstance::update(void)
             if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::HOVER))
             {
                 this->status_fsm.execute("from_idle_to_edit");
+                spdlog::debug("IDLE : switching to EDIT");
             }
         }
         else if (this->status_fsm.state() == StatusStates::EDIT)
@@ -144,10 +148,16 @@ void AnnotationInstance::update(void)
             // switch to idle mode
             if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE))
             {
-                this->status_fsm.execute("from_edit_to_idle");
+                this->status_fsm.execute("from_edit_to_cancel");
+                spdlog::debug("EDIT : cancelling current action");
             }
 
             // todo : edition logic
+        }
+        else if (this->status_fsm.state() == StatusStates::CANCEL)
+        {
+            this->status_fsm.execute("from_cancel_to_idle");
+            spdlog::debug("CANCEL : switching back to IDLE");
         }
     }
 }

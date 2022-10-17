@@ -35,6 +35,7 @@ enum class StatusStates
     CREATE,
     IDLE,
     EDIT,
+    CANCEL,
 };
 
 enum class HoverStates
