@@ -436,23 +436,31 @@ void AnnotationApp::update_annotation_fsm(void)
         }
     }
 
-    // todo : if create_statae_flag && escape : remove annotation and abort creation
-
-    // create state
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (create_state_flag == true))
+    // creating a new instance...
+    if (create_state_flag == true)
     {
-        // set the second corner coordinates
-        // todo : fix set corner end
-        this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
+        // abort creation on escape
+        if (ImGui::IsKeyPressed(526))
+        {
+            spdlog::debug("CANCEL : destroying instance");
+            this->annotations[active_annotation].inst.erase(this->annotations[active_annotation].inst.begin() + active_instance);
+        }
 
-        // fsm : switch to idle state
-        this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
+        // confirm creation on click
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            // set the second corner coordinates
+            this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
 
-        // todo : update state (bounding box)
-        this->annotations[active_annotation].inst[active_instance].update_bounding_box();
+            // fsm : switch to idle state
+            this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
 
-        // update json
-        this->json_write();
+            // todo : update state (bounding box)
+            this->annotations[active_annotation].inst[active_instance].update_bounding_box();
+
+            // update json
+            this->json_write();
+        }
     }
 
     // todo : render all annotation instances

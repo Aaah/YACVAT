@@ -34,7 +34,6 @@ AnnotationInstance::AnnotationInstance(void)
     // finite state machine : status
     this->status_fsm.add_transitions({
         {StatusStates::CREATE, StatusStates::IDLE, "from_create_to_idle", nullptr, nullptr},
-        {StatusStates::CREATE, StatusStates::CANCEL, "from_create_to_cancel", nullptr, nullptr},
         {StatusStates::IDLE, StatusStates::EDIT, "from_idle_to_edit", nullptr, nullptr},
         {StatusStates::EDIT, StatusStates::IDLE, "from_edit_to_idle", nullptr, nullptr},
         {StatusStates::EDIT, StatusStates::CANCEL, "from_edit_to_cancel", nullptr, nullptr},
