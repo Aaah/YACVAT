@@ -201,11 +201,11 @@ void AnnotationApp::json_write(void)
         {
             json_data[this->annotations[n].label.c_str()]["instances"].push_back(
                 nlohmann::json::object({
-                    {"file", this->annotations[n].inst[m].img_fname.c_str()}, // file
-                    {"x_start", this->annotations[n].inst[m].coords[0].x},    // x start coordinates
-                    {"y_start", this->annotations[n].inst[m].coords[0].y},    // y start coordinates
-                    {"x_end", this->annotations[n].inst[m].coords[1].x},      // x end coordinates
-                    {"y_end", this->annotations[n].inst[m].coords[1].y}       // y end coordinates
+                    {"file", this->annotations[n].inst[m].img_fname.c_str()},                         // file
+                    {"x_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().x},   // x start coordinates
+                    {"y_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().y},   // y start coordinates
+                    {"x_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().x}, // x end coordinates
+                    {"y_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().y}  // y end coordinates
                 }));
         }
     }
@@ -282,8 +282,8 @@ void AnnotationApp::json_read(void)
                 float y_start = val["y_start"].get<float>(); // * this->scale;
                 float x_end = val["x_end"].get<float>();     // * this->scale;
                 float y_end = val["y_end"].get<float>();     // * this->scale;
-                _inst.set_corner_start(ImVec2(x_start, y_start));
-                _inst.set_corner_end(ImVec2(x_end, y_end));
+                _inst.rect_on_image.set_topleft_vertex(ImVec2(x_start, y_start));
+                _inst.rect_on_image.set_bottomright_vertex(ImVec2(x_end, y_end));
 
                 // retrieve color
                 for (int k = 0; k < 4; k++)
@@ -421,7 +421,8 @@ void AnnotationApp::update_annotation_fsm(void)
             {
                 AnnotationInstance _ann = AnnotationInstance();
                 _ann.set_fname(this->image_fname);
-                _ann.set_corner_start(cursor_pos);
+                _ann.rect_on_image.set_bottomright_vertex(cursor_pos);
+                _ann.rect_on_image.set_topleft_vertex(cursor_pos);
                 _ann.set_color(this->annotations[n].color);
 
                 this->annotations[n].inst.push_back(_ann);
@@ -430,8 +431,8 @@ void AnnotationApp::update_annotation_fsm(void)
                              this->annotations[n].label,
                              this->annotations[n].type,
                              this->annotations[n].inst.back().img_fname,
-                             this->annotations[n].inst.back().coords[0].x,
-                             this->annotations[n].inst.back().coords[0].y);
+                             this->annotations[n].inst.back().rect_on_image.get_topleft_vertex().x,
+                             this->annotations[n].inst.back().rect_on_image.get_topleft_vertex().y);
             }
         }
     }
@@ -450,7 +451,7 @@ void AnnotationApp::update_annotation_fsm(void)
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
             // set the second corner coordinates
-            this->annotations[active_annotation].inst[active_instance].set_corner_end(cursor_pos);
+            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_bottomright_vertex(cursor_pos);
 
             // fsm : switch to idle state
             this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");

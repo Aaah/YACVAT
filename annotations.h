@@ -5,6 +5,7 @@
 #include <vector>
 #include "fsm.h"
 #include "imgui.h"
+#include "rectangle.h"
 
 /*
 
@@ -45,19 +46,6 @@ enum class HoverStates
     HOVER,
 };
 
-class Rectangle
-{
-public:
-    Rectangle();
-    Rectangle(ImVec2 start, ImVec2 end);
-    bool intersect(Rectangle rect);
-    bool inside(ImVec2 point);
-    ImVec2 center;
-    ImVec2 span;
-
-private:
-};
-
 class AnnotationInstance
 {
 public:
@@ -65,14 +53,12 @@ public:
     AnnotationInstance(void);          // init
     void set_fname(std::string fname); // set file name
     void set_color(float color[4]);    // set color
-    void set_corner_start(ImVec2 pos); // set one corner coordinates
-    void set_corner_end(ImVec2 pos);   // set the opposite end corder coordinates
     void draw(void);                   // draw itself on picture
     void update(void);                 // update fsm
     void update_bounding_box(void);    // update inner and outer hover box;
 
     // attributes
-    ImVec2 coords[2];                                                     // coordinates : x_start, y_start, x_end, y_end
+    Rectangle rect_on_image;                                              // coordinates on image : x_start, y_start, x_end, y_end
     FSM::Fsm<StatusStates, StatusStates::CREATE, std::string> status_fsm; // state machine to handle rendering
     FSM::Fsm<HoverStates, HoverStates::HOVER, std::string> hover_fsm;     // state machine to handle logic in edit mode
     uint8_t color_u8[4];                                                  // color
@@ -80,12 +66,11 @@ public:
     bool selected;                                                        // is the instance being edited
 
 private:
-    int delta;            //
-    Rectangle outer_rect; // bounding box to detect mouse hover
-    Rectangle inner_rect; // bounding box to detect mouse hover
-    ImVec2 start_vertex;
-    ImVec2 end_vertex;
-    ImVec2 mouse_on_image;
+    int delta;             // offset to compute bounding boxes from the actual annotation box
+    ImVec2 mouse_on_image; // mouse coordinates on the image
+    Rectangle rect;        // actual annotation box on screen
+    Rectangle outer_rect;  // bounding box to detect mouse hover
+    Rectangle inner_rect;  // bounding box to detect mouse hover
 };
 
 class Annotation

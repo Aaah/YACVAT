@@ -13,6 +13,7 @@ include_directories(${SDL2_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
 add_executable(yacvat main.cpp 
     app.cpp 
     annotations.cpp
+    rectangle.cpp
     lib/imgui/imgui.cpp
     lib/imgui/imgui_draw.cpp
     lib/imgui/imgui_tables.cpp

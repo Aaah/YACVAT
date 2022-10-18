@@ -56,14 +56,30 @@ AnnotationInstance::AnnotationInstance(void)
 
 void AnnotationInstance::update_bounding_box(void)
 {
-    this->outer_rect.center.x = std::abs(this->coords[1].x + this->coords[0].x) / 2.0;
-    this->outer_rect.center.y = std::abs(this->coords[1].y + this->coords[0].y) / 2.0;
-    this->outer_rect.span.x = std::abs(this->coords[1].x - this->coords[0].x) + this->delta;
-    this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
 
-    this->inner_rect.center = this->outer_rect.center;
-    this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
-    this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
+    // outer rect on screen
+    this->outer_rect.set_center(this->rect.get_center());
+
+    ImVec2 span = this->rect.get_span();
+    span.x += this->delta;
+    span.y += this->delta;
+    this->outer_rect.set_span(span);
+
+    this->outer_rect.set_center(this->rect.get_center());
+
+    span = this->rect.get_span();
+    span.x = std::fmax(1, span.x - this->delta);
+    span.y = std::fmax(1, span.y - this->delta);
+    this->inner_rect.set_span(span);
+
+    // this->outer_rect.center.x = std::abs(this->coords[1].x + this->coords[0].x) / 2.0;
+    // this->outer_rect.center.y = std::abs(this->coords[1].y + this->coords[0].y) / 2.0;
+    // this->outer_rect.span.x = std::abs(this->coords[1].x - this->coords[0].x) + this->delta;
+    // this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
+
+    // this->inner_rect.center = this->outer_rect.center;
+    // this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
+    // this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
 }
 
 void AnnotationInstance::set_fname(std::string fname)
@@ -77,19 +93,6 @@ void AnnotationInstance::set_color(float color[4])
         this->color_u8[k] = color[k] * 255;
 }
 
-void AnnotationInstance::set_corner_start(ImVec2 pos)
-{
-    this->coords[0] = pos;
-}
-
-void AnnotationInstance::set_corner_end(ImVec2 pos)
-{
-    coords[1].x = std::max(coords[0].x, pos.x);
-    coords[1].y = std::max(coords[0].y, pos.y);
-    coords[0].x = std::min(coords[0].x, pos.x);
-    coords[0].y = std::min(coords[0].y, pos.y);
-}
-
 void AnnotationInstance::update(void)
 {
     // goal : change states
@@ -97,12 +100,14 @@ void AnnotationInstance::update(void)
 
     ImVec2 _w = ImGui::GetWindowPos();
     ImVec2 _m = ImGui::GetMousePos();
+    ImVec2 _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
+    ImVec2 _rect_on_image_bottomright = this->rect_on_image.get_bottomright_vertex();
 
     // mouse position on image
     this->mouse_on_image = ImVec2(_m.x - _w.x, _m.y - _w.y);
 
     // compute absolute coodinates of the start vertex
-    this->start_vertex = ImVec2(_w.x + this->coords[0].x, _w.y + this->coords[0].y);
+    this->rect.set_topleft_vertex(ImVec2(_w.x + _rect_on_image_topleft.x, _w.y + _rect_on_image_topleft.y));
 
     // update HOVER fsm
     if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(this->mouse_on_image))
@@ -126,12 +131,12 @@ void AnnotationInstance::update(void)
     if (this->status_fsm.state() == StatusStates::CREATE)
     {
         // the end vertex is the mouse position on screen
-        this->end_vertex = _m;
+        this->rect.set_bottomright_vertex(_m);
     }
     else
     {
         // position on screen of the end vertex
-        this->end_vertex = ImVec2(this->coords[1].x + _w.x, this->coords[1].y + _w.y);
+        this->rect.set_bottomright_vertex(ImVec2(_rect_on_image_bottomright.x + _w.x, _rect_on_image_bottomright.y + _w.y));
 
         if (this->status_fsm.state() == StatusStates::IDLE)
         {
@@ -154,7 +159,7 @@ void AnnotationInstance::update(void)
             // todo : edition logic
             // todo : simplify use of coords / vertex... redundant!
             // todo : on mouse drag inside, move coords + vertex
-            // todo : edit single side on hover + drag + edge detection 
+            // todo : edit single side on hover + drag + edge detection
         }
         else if (this->status_fsm.state() == StatusStates::CANCEL)
         {
@@ -171,7 +176,7 @@ void AnnotationInstance::draw(void)
     if (this->status_fsm.state() == StatusStates::CREATE)
     {
         // draw the rectangle all the way to the mouse cursor
-        draw_list->AddRect(this->start_vertex, ImGui::GetMousePos(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
+        draw_list->AddRect(this->rect.get_topleft_vertex(), ImGui::GetMousePos(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
     }
     else
     {
@@ -190,44 +195,6 @@ void AnnotationInstance::draw(void)
             _thickness = 2.0;
         }
 
-        draw_list->AddRect(this->start_vertex, this->end_vertex, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
+        draw_list->AddRect(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
     }
-}
-
-Rectangle::Rectangle(void)
-{
-}
-
-Rectangle::Rectangle(ImVec2 start, ImVec2 end)
-{
-    this->span.x = std::abs(end.x - start.x);
-    this->span.y = std::abs(end.y - start.y);
-
-    if (start.x < end.x)
-        this->center.x = start.x + 0.5 * this->span.x;
-    else
-        this->center.x = end.x + 0.5 * this->span.x;
-
-    if (start.y < end.y)
-        this->center.y = start.y + 0.5 * this->span.y;
-    else
-        this->center.y = end.y + 0.5 * this->span.y;
-}
-
-bool Rectangle::intersect(Rectangle rect)
-{
-    if ((std::abs(center.x - rect.center.x) < 0.5 * (span.x + rect.span.x)) && (std::abs(center.y - rect.center.y) < 0.5 * (span.y + rect.span.y)))
-    {
-        return true;
-    }
-    return false;
-}
-
-bool Rectangle::inside(ImVec2 point)
-{
-    if ((2.0 * std::abs(point.x - center.x) < span.x) && (2.0 * std::abs(point.y - center.y) < span.y))
-    {
-        return true;
-    }
-    return false;
 }
