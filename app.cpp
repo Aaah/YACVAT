@@ -282,8 +282,8 @@ void AnnotationApp::json_read(void)
                 float y_start = val["y_start"].get<float>(); // * this->scale;
                 float x_end = val["x_end"].get<float>();     // * this->scale;
                 float y_end = val["y_end"].get<float>();     // * this->scale;
-                _inst.rect_on_image.set_topleft_vertex(ImVec2(x_start, y_start));
                 _inst.rect_on_image.set_bottomright_vertex(ImVec2(x_end, y_end));
+                _inst.rect_on_image.set_topleft_vertex(ImVec2(x_start, y_start));
 
                 // retrieve color
                 for (int k = 0; k < 4; k++)
@@ -291,7 +291,6 @@ void AnnotationApp::json_read(void)
 
                 // switch state to idle
                 _inst.status_fsm.execute("from_create_to_idle");
-                _inst.update_bounding_box();
 
                 // push annotation instance
                 this->annotations.back().inst.push_back(_inst);
@@ -457,6 +456,7 @@ void AnnotationApp::update_annotation_fsm(void)
             this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
 
             // todo : update state (bounding box)
+            this->annotations[active_annotation].inst[active_instance].update();
             this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
             // update json

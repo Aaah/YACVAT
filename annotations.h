@@ -66,11 +66,11 @@ public:
     bool selected;                                                        // is the instance being edited
 
 private:
-    int delta;             // offset to compute bounding boxes from the actual annotation box
-    ImVec2 mouse_on_image; // mouse coordinates on the image
-    Rectangle rect;        // actual annotation box on screen
-    Rectangle outer_rect;  // bounding box to detect mouse hover
-    Rectangle inner_rect;  // bounding box to detect mouse hover
+    int delta;            // offset to compute bounding boxes from the actual annotation box
+    ImVec2 window_pos;    // window position on screen
+    Rectangle rect;       // actual annotation box on screen
+    Rectangle outer_rect; // bounding box to detect mouse hover
+    Rectangle inner_rect; // bounding box to detect mouse hover
 };
 
 class Annotation

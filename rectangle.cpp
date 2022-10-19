@@ -58,15 +58,7 @@ void Rectangle::set_span(ImVec2 point)
 void Rectangle::set_topleft_vertex(ImVec2 point)
 {
     // when setting one vertex, the second remains the same
-    if ((point.x > bottomright_vertex.x) && (point.y > bottomright_vertex.y))
-    {
-        topleft_vertex = bottomright_vertex;
-        bottomright_vertex = point;
-    }
-    else
-    {
-        topleft_vertex = point;
-    }
+    topleft_vertex = point;
 
     // update span and center
     span.x = std::abs(topleft_vertex.x - bottomright_vertex.x);

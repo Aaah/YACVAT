@@ -56,30 +56,24 @@ AnnotationInstance::AnnotationInstance(void)
 
 void AnnotationInstance::update_bounding_box(void)
 {
-
     // outer rect on screen
     this->outer_rect.set_center(this->rect.get_center());
-
     ImVec2 span = this->rect.get_span();
     span.x += this->delta;
     span.y += this->delta;
     this->outer_rect.set_span(span);
 
-    this->outer_rect.set_center(this->rect.get_center());
-
+    // inner rect on screen
+    this->inner_rect.set_center(this->rect.get_center());
     span = this->rect.get_span();
     span.x = std::fmax(1, span.x - this->delta);
     span.y = std::fmax(1, span.y - this->delta);
     this->inner_rect.set_span(span);
 
-    // this->outer_rect.center.x = std::abs(this->coords[1].x + this->coords[0].x) / 2.0;
-    // this->outer_rect.center.y = std::abs(this->coords[1].y + this->coords[0].y) / 2.0;
-    // this->outer_rect.span.x = std::abs(this->coords[1].x - this->coords[0].x) + this->delta;
-    // this->outer_rect.span.y = std::abs(this->coords[1].y - this->coords[0].y) + this->delta;
-
-    // this->inner_rect.center = this->outer_rect.center;
-    // this->inner_rect.span.x = std::max(1, (int)std::abs(this->coords[1].x - this->coords[0].x) - this->delta);
-    // this->inner_rect.span.y = std::max(1, (int)std::abs(this->coords[1].y - this->coords[0].y) - this->delta);
+    spdlog::debug("Bounding box updated");
+    // spdlog::debug("Box (on screen) : box [{}, {}, {}, {}]", this->rect.get_center().x, this->rect.get_center().y, this->rect.get_span().x, this->rect.get_span().y);
+    // spdlog::debug("Box (on screen) : outer [{}, {}, {}, {}]", this->outer_rect.get_center().x, this->outer_rect.get_center().y, this->outer_rect.get_span().x, this->outer_rect.get_span().y);
+    // spdlog::debug("Box (on screen) : inner [{}, {}, {}, {}]", this->inner_rect.get_center().x, this->inner_rect.get_center().y, this->inner_rect.get_span().x, this->inner_rect.get_span().y);
 }
 
 void AnnotationInstance::set_fname(std::string fname)
@@ -95,34 +89,37 @@ void AnnotationInstance::set_color(float color[4])
 
 void AnnotationInstance::update(void)
 {
-    // goal : change states
-    // define start & end vec2 to draw
-
     ImVec2 _w = ImGui::GetWindowPos();
+    bool update_flag = false;
+    if ((_w.x != this->window_pos.x) || (_w.y != this->window_pos.y))
+    {
+        update_flag = true;
+        this->window_pos = _w;
+    }
+
     ImVec2 _m = ImGui::GetMousePos();
+
+    // compute absolute coodinates of the start vertex
     ImVec2 _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
     ImVec2 _rect_on_image_bottomright = this->rect_on_image.get_bottomright_vertex();
 
-    // mouse position on image
-    this->mouse_on_image = ImVec2(_m.x - _w.x, _m.y - _w.y);
-
-    // compute absolute coodinates of the start vertex
-    this->rect.set_topleft_vertex(ImVec2(_w.x + _rect_on_image_topleft.x, _w.y + _rect_on_image_topleft.y));
+    if (update_flag == true)
+        this->rect.set_topleft_vertex(ImVec2(window_pos.x + _rect_on_image_topleft.x, window_pos.y + _rect_on_image_topleft.y));
 
     // update HOVER fsm
-    if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(this->mouse_on_image))
+    if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(_m))
     {
         this->hover_fsm.execute("from_hover_to_outside");
     }
-    else if ((this->hover_fsm.state() == HoverStates::HOVER) && inner_rect.inside(this->mouse_on_image))
+    else if ((this->hover_fsm.state() == HoverStates::HOVER) && inner_rect.inside(_m))
     {
         this->hover_fsm.execute("from_hover_to_inside");
     }
-    else if ((this->hover_fsm.state() == HoverStates::OUTSIDE) && outer_rect.inside(this->mouse_on_image))
+    else if ((this->hover_fsm.state() == HoverStates::OUTSIDE) && outer_rect.inside(_m))
     {
         this->hover_fsm.execute("from_outside_to_hover");
     }
-    else if ((this->hover_fsm.state() == HoverStates::INSIDE) && !inner_rect.inside(this->mouse_on_image))
+    else if ((this->hover_fsm.state() == HoverStates::INSIDE) && !inner_rect.inside(_m))
     {
         this->hover_fsm.execute("from_inside_to_hover");
     }
@@ -136,7 +133,8 @@ void AnnotationInstance::update(void)
     else
     {
         // position on screen of the end vertex
-        this->rect.set_bottomright_vertex(ImVec2(_rect_on_image_bottomright.x + _w.x, _rect_on_image_bottomright.y + _w.y));
+        if (update_flag == true)
+            this->rect.set_bottomright_vertex(ImVec2(_rect_on_image_bottomright.x + window_pos.x, _rect_on_image_bottomright.y + window_pos.y));
 
         if (this->status_fsm.state() == StatusStates::IDLE)
         {
@@ -167,6 +165,9 @@ void AnnotationInstance::update(void)
             spdlog::debug("CANCEL : switching back to IDLE");
         }
     }
+
+    if (update_flag == true)
+        this->update_bounding_box();
 }
 
 void AnnotationInstance::draw(void)
