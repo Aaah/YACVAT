@@ -154,8 +154,26 @@ void AnnotationInstance::update(void)
                 spdlog::debug("EDIT : cancelling current action");
             }
 
-            // todo : edition logic
-            // todo : simplify use of coords / vertex... redundant!
+            // drag instance around in the image
+            if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE))
+            {
+                ImVec2 center = this->rect.get_center();
+                center.x += ImGui::GetMouseDragDelta().x;
+                center.y += ImGui::GetMouseDragDelta().y;
+                ImGui::ResetMouseDragDelta();
+                this->rect.set_center(center);
+                update_flag = true;
+                this->dragging_flag = true;
+                // todo : handle image borders?
+            }
+            else
+            {
+                if (this->dragging_flag == true)
+                {
+                    this->dragging_flag = false;
+                    this->request_json_write = true;
+                }
+            }
             // todo : on mouse drag inside, move coords + vertex
             // todo : edit single side on hover + drag + edge detection
         }

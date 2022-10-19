@@ -64,6 +64,7 @@ public:
     uint8_t color_u8[4];                                                  // color
     std::string img_fname;                                                // image file containing the annotation instance
     bool selected;                                                        // is the instance being edited
+    bool request_json_write;                                              // has the isntance been update in a way that requires a json dump
 
 private:
     int delta;            // offset to compute bounding boxes from the actual annotation box
@@ -71,6 +72,7 @@ private:
     Rectangle rect;       // actual annotation box on screen
     Rectangle outer_rect; // bounding box to detect mouse hover
     Rectangle inner_rect; // bounding box to detect mouse hover
+    bool dragging_flag;   // is the instance being dragged
 };
 
 class Annotation

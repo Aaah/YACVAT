@@ -393,6 +393,7 @@ void AnnotationApp::update_annotation_fsm(void)
     bool create_state_flag = false;       // if true, fsm is creating and rendering the annotation instance
     int active_annotation = -1;           // track the id of the active annotation
     int active_instance = -1;             // track the id of the active instance
+    bool need_json_write = false;
 
     // parse all states and instances to define the next FSM action
     for (long unsigned n = 0; n < this->annotations.size(); n++)
@@ -413,6 +414,12 @@ void AnnotationApp::update_annotation_fsm(void)
                 active_annotation = n;
                 active_instance = m;
                 continue;
+            }
+
+            if (this->annotations[n].inst[m].request_json_write == true)
+            {
+                need_json_write = true;
+                this->annotations[n].inst[m].request_json_write = false;
             }
         }
     }
@@ -465,12 +472,14 @@ void AnnotationApp::update_annotation_fsm(void)
             this->annotations[active_annotation].inst[active_instance].update();
             this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
-            // update json
-            this->json_write();
+            // request json update
+            need_json_write = true;
         }
     }
 
-    // todo : render all annotation instances
+    // update json
+    if (need_json_write == true)
+        this->json_write();
 }
 
 void AnnotationApp::check_annotations_file(void)
