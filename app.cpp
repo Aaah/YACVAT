@@ -153,6 +153,12 @@ void AnnotationApp::ui_annotations_panel(void)
                                 }
                             }
                         }
+
+                        // toggle edit mode
+                        if (this->annotations[n].inst[m].selected)
+                        {
+                            this->annotations[n].inst[m].status_fsm.execute("from_idle_to_edit");
+                        }
                     }
 
                     ImGui::TableSetColumnIndex(1);
