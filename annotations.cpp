@@ -132,6 +132,9 @@ void AnnotationInstance::update(void)
     }
     else
     {
+        // the instance is unselected unless it is in edit mode
+        this->selected = false;
+
         // position on screen of the end vertex
         if (update_flag == true)
             this->rect.set_bottomright_vertex(ImVec2(_rect_on_image_bottomright.x + window_pos.x, _rect_on_image_bottomright.y + window_pos.y));
@@ -147,6 +150,9 @@ void AnnotationInstance::update(void)
         }
         else if (this->status_fsm.state() == StatusStates::EDIT)
         {
+            // the instance is selected by default in edit mode
+            this->selected = true;
+
             // switch to idle mode
             if (ImGui::IsKeyPressed(526) || (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE)))
             {
@@ -216,9 +222,9 @@ void AnnotationInstance::draw(void)
             // increase thickness in this mode
             _thickness = 2.0;
 
-            if (this->dragging_flag == true)
+            if ((this->hover_fsm.state() == HoverStates::INSIDE) && (this->dragging_flag == false))
             {
-                draw_list->AddRectFilled(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 25));
+                draw_list->AddRectFilled(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 10));
             }
         }
 

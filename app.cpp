@@ -400,7 +400,6 @@ void AnnotationApp::update_annotation_fsm(void)
     {
         for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
         {
-            // spdlog::debug("annotation {} : instance {} state = {})", this->annotations[n].label, m, this->annotations[n].inst[m].fsm.state());
             if (this->annotations[n].inst[m].status_fsm.state() != StatusStates::IDLE)
             {
                 create_new_instance_flag = false;
@@ -416,6 +415,14 @@ void AnnotationApp::update_annotation_fsm(void)
                 continue;
             }
 
+            // delete annotation instance on DELETE
+            if ((this->annotations[n].inst[m].selected == true) && ImGui::IsKeyPressed(ImGuiKey_Delete))
+            {
+                this->annotations[n].inst.erase(this->annotations[n].inst.begin() + m);
+                this->annotations[n].inst[m].request_json_write = true;
+            }
+
+            // order a json write
             if (this->annotations[n].inst[m].request_json_write == true)
             {
                 need_json_write = true;
