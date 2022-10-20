@@ -183,7 +183,6 @@ void AnnotationInstance::update(void)
                     this->rect_on_image.set_center(center);
                 }
             }
-            // todo : on mouse drag inside, move coords + vertex
             // todo : edit single side on hover + drag + edge detection
         }
         else if (this->status_fsm.state() == StatusStates::CANCEL)
@@ -222,9 +221,9 @@ void AnnotationInstance::draw(void)
             // increase thickness in this mode
             _thickness = 2.0;
 
-            if ((this->hover_fsm.state() == HoverStates::INSIDE) && (this->dragging_flag == false))
+            if ((this->hover_fsm.state() == HoverStates::INSIDE) || (this->dragging_flag == true))
             {
-                draw_list->AddRectFilled(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 10));
+                draw_list->AddRectFilled(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 25));
             }
         }
 

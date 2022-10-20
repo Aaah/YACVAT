@@ -80,7 +80,8 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::TableSetColumnIndex(2);
             sprintf(_unused_ids, "##inputtext%ld", n);
             ImGui::PushItemWidth(-1);
-            if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64, ImGuiInputTextFlags_EnterReturnsTrue))
+            // ImGuiInputTextFlags_EnterReturnsTrue
+            if (ImGui::InputText(_unused_ids, this->annotations[n].new_label, 64))
             {
                 this->annotations[n].label = this->annotations[n].new_label; // basic recopy for now
                 spdlog::debug("[label {}] new label : {}", n, this->annotations[n].label);
@@ -123,7 +124,7 @@ void AnnotationApp::ui_annotations_panel(void)
     // list annotations in the current image
     if (ImGui::BeginTable("table_annotations_inst", 2, flags))
     {
-        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Instances", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableHeadersRow();
 
