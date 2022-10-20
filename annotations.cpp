@@ -155,23 +155,26 @@ void AnnotationInstance::update(void)
             }
 
             // drag instance around in the image
-            if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE))
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE))
             {
-                ImVec2 center = this->rect.get_center();
-                center.x += ImGui::GetMouseDragDelta().x;
-                center.y += ImGui::GetMouseDragDelta().y;
-                ImGui::ResetMouseDragDelta();
-                this->rect.set_center(center);
-                update_flag = true;
+                // update flag are set to trigger processing when the drag stops
                 this->dragging_flag = true;
-                // todo : handle image borders?
             }
-            else
+
+            if (this->dragging_flag == true)
             {
-                if (this->dragging_flag == true)
+                // update the center of the rectangle on the screen to follow the mouse cursor
+                this->rect.set_center(_m);
+
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
                 {
-                    this->dragging_flag = false;
-                    this->request_json_write = true;
+                    update_flag = true;                      // request bounding box update
+                    this->dragging_flag = false;             // reset the processing flag
+                    this->request_json_write = true;         // request a json dump
+                    ImVec2 center = this->rect.get_center(); // update the rect on image
+                    center.x -= this->window_pos.x;
+                    center.y -= this->window_pos.y;
+                    this->rect_on_image.set_center(center);
                 }
             }
             // todo : on mouse drag inside, move coords + vertex
@@ -212,6 +215,11 @@ void AnnotationInstance::draw(void)
         {
             // increase thickness in this mode
             _thickness = 2.0;
+
+            if (this->dragging_flag == true)
+            {
+                draw_list->AddRectFilled(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 25));
+            }
         }
 
         draw_list->AddRect(this->rect.get_topleft_vertex(), this->rect.get_bottomright_vertex(), IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 0.0, 0, _thickness);
