@@ -10,6 +10,8 @@
 #endif
 
 #include <filesystem>
+#include "getopt.h"
+#include "version.h"
 #include "app.h"             // context application
 #include "ImGuiFileDialog.h" // add-on filedialogs
 #include "spdlog/spdlog.h"   // logs
@@ -114,10 +116,45 @@ int ImGui_AnnotationTool(void)
 }
 
 // Main code
-int main(int, char **)
+int main(int argc, char **argv)
 {
     // logs level
     spdlog::set_level(spdlog::level::debug);
+
+    int c;
+    int verbose_flag = 0;
+    int version_flag = 0;
+    static struct option long_options[] =
+        {
+            {"verbose", no_argument, &verbose_flag, 1},
+            {"version", no_argument, &version_flag, 1}};
+
+    int option_index;
+    while ((c = getopt_long(argc, argv, ":::", long_options, &option_index)) != -1)
+    {
+        switch (c)
+        {
+        case 0:
+        {
+            if (version_flag)
+            {
+                spdlog::info("Version of YACVAT is {}.{}.{}", YACVAT_VER_MAJOR, YACVAT_VER_MINOR, YACVAT_VER_PATCH);
+            }
+
+            spdlog::set_level(spdlog::level::critical);
+            if (verbose_flag)
+            {
+                spdlog::set_level(spdlog::level::debug);
+            }
+
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+    }
 
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,

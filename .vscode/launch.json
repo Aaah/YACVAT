@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/yacvat",
-            "args": [],
+            "args": ["--version --verbose"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
