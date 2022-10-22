@@ -50,9 +50,15 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::TableNextRow();
 
             // shortcut to select the annotation
+            if ((n < 12) && ImGui::IsKeyPressed(ImGuiKey_F1 + n))
+            {
+                this->activate_annotation(n);
+            }
+
+            // display the name of the shortcut
             ImGui::TableSetColumnIndex(0);
             this->annotations[n].shortcut = n;
-            sprintf(_unused_ids, "%d##shortcutext", this->annotations[n].shortcut);
+            sprintf(_unused_ids, "F%d##shortcutext", this->annotations[n].shortcut + 1);
             if (ImGui::Selectable(_unused_ids, &this->annotations[n].selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap))
             {
                 spdlog::debug("selecting : {} -> {}", n, this->annotations[n].selected);
@@ -362,9 +368,9 @@ void AnnotationApp::ui_image_current()
             ImVec2(1.0f, 1.0f)                                                 // (x,y) coordinates end in [0.0, 1.0]
         );
 
-        // draw all annotations instances on the image
         for (long unsigned n = 0; n < this->annotations.size(); n++)
         {
+            // draw all annotations instances on the image
             for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
             {
                 if (this->annotations[n].inst[m].img_fname == this->image_fname)
@@ -396,9 +402,9 @@ void AnnotationApp::update_annotation_fsm(void)
     int active_instance = -1;             // track the id of the active instance
     bool need_json_write = false;
 
-    // parse all states and instances to define the next FSM action
     for (long unsigned n = 0; n < this->annotations.size(); n++)
     {
+        // parse all states and instances to define the next FSM action
         for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
         {
             if (this->annotations[n].inst[m].status_fsm.state() != StatusStates::IDLE)
@@ -584,4 +590,20 @@ bool AnnotationApp::read_image(const char *filename, GLuint *out_texture, int *o
     *out_height = image_height;
 
     return true;
+}
+
+void AnnotationApp::activate_annotation(long unsigned int k)
+{
+    for (long unsigned int n = 0; n < this->annotations.size(); n++)
+    {
+        if (n == k)
+        {
+            this->annotations[n].selected = true;
+        }
+        else
+        {
+
+            this->annotations[n].selected = false;
+        }
+    }
 }

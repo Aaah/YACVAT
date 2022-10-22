@@ -43,12 +43,13 @@ private:
     nlohmann::json json;                  // json data structure
 
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);
-    void ui_annotations_continue(void); // ui panel if an annotations file exists
-    void ui_annotations_setup(void);    // ui panel if no annotations file exists
-    void check_annotations_file(void);  // look for the presence of an annotations file
-    void json_update_annoations(void);  // create annotations file (with labels and types)
-    void json_update_header(void);      // create annotations file (with labels and types)
-    void json_parse_header(void);       // create annotations file (with labels and types)
+    void ui_annotations_continue(void);            // ui panel if an annotations file exists
+    void ui_annotations_setup(void);               // ui panel if no annotations file exists
+    void check_annotations_file(void);             // look for the presence of an annotations file
+    void json_update_annoations(void);             // create annotations file (with labels and types)
+    void json_update_header(void);                 // create annotations file (with labels and types)
+    void json_parse_header(void);                  // create annotations file (with labels and types)
+    void activate_annotation(long unsigned int n); // activate annotation n and deactivate all others
 };
 
 #endif
