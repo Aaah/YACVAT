@@ -53,7 +53,8 @@ public:
     AnnotationInstance(void);          // init
     void set_fname(std::string fname); // set file name
     void set_color(float color[4]);    // set color
-    void draw(void);                   // draw itself on picture
+    void draw_area(void);                   // draw itself on picture
+    void draw_point(void);                   // draw itself on picture
     void update(void);                 // update fsm
     void update_bounding_box(void);    // update inner and outer hover box;
 

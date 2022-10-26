@@ -379,7 +379,14 @@ void AnnotationApp::ui_image_current()
                     this->annotations[n].inst[m].update();
 
                     // draw on screen
-                    this->annotations[n].inst[m].draw();
+                    if (this->annotations[n].type == ANNOTATION_TYPE_AREA)
+                    {
+                        this->annotations[n].inst[m].draw_area();
+                    }
+                    else
+                    {
+                        this->annotations[n].inst[m].draw_point();
+                    }
                 }
             }
         }
@@ -473,21 +480,36 @@ void AnnotationApp::update_annotation_fsm(void)
             this->annotations[active_annotation].inst.erase(this->annotations[active_annotation].inst.begin() + active_instance);
         }
 
-        // confirm creation on click
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        // complete creation
+        if (this->annotations[active_annotation].type == ANNOTATION_TYPE_POINT)
         {
-            // set the second corner coordinates
-            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_bottomright_vertex(cursor_pos);
-
-            // fsm : switch to idle state
+            // POINT : set center at mouse cursor and switch to idle
+            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_center(cursor_pos);
+            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_span(ImVec2(10, 10));
             this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
-
-            // todo : update state (bounding box)
             this->annotations[active_annotation].inst[active_instance].update();
             this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
-            // request json update
             need_json_write = true;
+        }
+        else
+        {
+            // AREA : complete on mouse click
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+            {
+                // set the second corner coordinates
+                this->annotations[active_annotation].inst[active_instance].rect_on_image.set_bottomright_vertex(cursor_pos);
+
+                // fsm : switch to idle state
+                this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
+
+                // update state (bounding box)
+                this->annotations[active_annotation].inst[active_instance].update();
+                this->annotations[active_annotation].inst[active_instance].update_bounding_box();
+
+                // request json update
+                need_json_write = true;
+            }
         }
     }
 
