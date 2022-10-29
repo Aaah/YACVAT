@@ -28,14 +28,6 @@ int ImGui_AnnotationTool(void)
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 
-    ImGui::BeginChild("Pane1", ImVec2(600, -1.f), false, ImGuiWindowFlags_AlwaysAutoResize);
-
-    app.ui_image_current();
-
-    ImGui::EndChild();
-
-    ImGui::SameLine();
-
     ImGui::BeginChild("Pane2", ImVec2(200, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
     if (ImGui::BeginMenuBar())
@@ -76,7 +68,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Pane3", ImVec2(400, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+    ImGui::BeginChild("Pane3", ImVec2(300, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
     if (ImGui::BeginMenuBar())
     {
@@ -93,6 +85,15 @@ int ImGui_AnnotationTool(void)
     app.ui_annotations_panel();
 
     ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    ImGui::BeginChild("Pane1", ImVec2(-1.f, -1.f), false, ImGuiWindowFlags_AlwaysAutoResize);
+
+    app.ui_image_current();
+
+    ImGui::EndChild();
+
 
     ImGui::PopStyleVar();
     ImGui::End();
