@@ -24,14 +24,11 @@ int ImGui_AnnotationTool(void)
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
-    // ImGui::SetNextWindowViewport(viewport->);
-
-    // ImGui::SetNextWindowSizeConstraints(ImVec2(300.f, -1.f), ImVec2(INFINITY, -1.f));
     ImGui::Begin("Annotation Tool", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 
-    ImGui::BeginChild("Pane1", ImVec2(600, 400), false, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("Pane1", ImVec2(600, -1.f), false, ImGuiWindowFlags_AlwaysAutoResize);
 
     app.ui_image_current();
 
@@ -39,7 +36,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Pane2", ImVec2(200, 400), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+    ImGui::BeginChild("Pane2", ImVec2(200, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
     if (ImGui::BeginMenuBar())
     {
@@ -79,7 +76,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Pane3", ImVec2(400, 400), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
+    ImGui::BeginChild("Pane3", ImVec2(400, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
     if (ImGui::BeginMenuBar())
     {
@@ -99,24 +96,7 @@ int ImGui_AnnotationTool(void)
 
     ImGui::PopStyleVar();
     ImGui::End();
-
-    // static float f = 0.0f;
-    // static int counter = 0;
-    // ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-    // ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
-    // ImGui::Checkbox("Demo Window", &check); // Edit bools storing our window open/close state
-    // ImGui::Checkbox("Another Window", &check);
-
-    // ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
-
-    // if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-    //     counter++;
-    // ImGui::SameLine();
-    // ImGui::Text("counter = %d", counter);
-
-    // ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
+    
     return 0;
 }
 
