@@ -343,6 +343,7 @@ void AnnotationApp::ui_images_folder(void)
 
             this->scale = 0.0;
             this->image_fname = e;
+            this->compute_scale_flag = true;
         }
         n++;
     }
@@ -350,7 +351,6 @@ void AnnotationApp::ui_images_folder(void)
 
 void AnnotationApp::ui_image_current()
 {
-    // load image in ram
     if (this->current_image_texture != 0)
     {
         // ImGui::Text("pointer = %p", current_image_texture);
@@ -358,8 +358,12 @@ void AnnotationApp::ui_image_current()
         // ImGui::Text("window size = %.0f x %.0f", ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
         // compute scaling factor to fir to the window (pane1)
-        if (this->scale == 0.0)
+        if (this->compute_scale_flag == true)
         {
+            // reset flag
+            this->compute_scale_flag = false;
+
+            // compute scale
             this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
             spdlog::debug("Resizing factor : {}", this->scale);
 

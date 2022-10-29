@@ -41,6 +41,7 @@ private:
     std::string annotation_fname;         // full path
     std::string image_fname;              // currently opened image file name
     nlohmann::json json;                  // json data structure
+    bool compute_scale_flag;              // compute scale factor to resize image
 
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);
     void ui_annotations_continue(void);            // ui panel if an annotations file exists
