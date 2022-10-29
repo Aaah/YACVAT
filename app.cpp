@@ -212,13 +212,14 @@ void AnnotationApp::json_write(void)
         json_data[this->annotations[n].label.c_str()]["instances"] = nlohmann::json::array();
         for (long unsigned m = 0; m < this->annotations[n].inst.size(); m++)
         {
+            // spdlog::debug("[{}, {}, {}, {}] / {}", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().x, this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().y, this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().x, this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().y, this->scale);
             json_data[this->annotations[n].label.c_str()]["instances"].push_back(
                 nlohmann::json::object({
-                    {"file", this->annotations[n].inst[m].img_fname.c_str()},                         // file
-                    {"x_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().x},   // x start coordinates
-                    {"y_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().y},   // y start coordinates
-                    {"x_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().x}, // x end coordinates
-                    {"y_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().y}  // y end coordinates
+                    {"file", this->annotations[n].inst[m].img_fname.c_str()},                                       // file
+                    {"x_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().x / this->scale},   // x start coordinates
+                    {"y_start", this->annotations[n].inst[m].rect_on_image.get_topleft_vertex().y / this->scale},   // y start coordinates
+                    {"x_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().x / this->scale}, // x end coordinates
+                    {"y_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().y / this->scale}  // y end coordinates
                 }));
         }
     }
@@ -291,10 +292,13 @@ void AnnotationApp::json_read(void)
 
                 // retrieve corner positions of the instance
                 // todo : handle scale, dunno why it's not working
-                float x_start = val["x_start"].get<float>(); // * this->scale;
-                float y_start = val["y_start"].get<float>(); // * this->scale;
-                float x_end = val["x_end"].get<float>();     // * this->scale;
-                float y_end = val["y_end"].get<float>();     // * this->scale;
+                float x_start = val["x_start"].get<float>() * this->scale;
+                float y_start = val["y_start"].get<float>() * this->scale;
+                float x_end = val["x_end"].get<float>() * this->scale;
+                float y_end = val["y_end"].get<float>() * this->scale;
+
+                // spdlog::debug("[{}, {}, {}, {}] * {}", x_start, y_start, x_end, y_end, this->scale);
+
                 _inst.rect_on_image.set_bottomright_vertex(ImVec2(x_end, y_end));
                 _inst.rect_on_image.set_topleft_vertex(ImVec2(x_start, y_start));
 
@@ -358,6 +362,9 @@ void AnnotationApp::ui_image_current()
         {
             this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
             spdlog::debug("Resizing factor : {}", this->scale);
+
+            // parse json once the scale is obtained
+            this->json_read();
         }
 
         // draw image

@@ -21,6 +21,8 @@ AnnotationApp app;
 
 int ImGui_AnnotationTool(void)
 {
+    // todo : resize panels when resizing the window
+
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
