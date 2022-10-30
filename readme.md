@@ -1,5 +1,13 @@
 # README
 
+YACVAT stands for Yet Another Computer Vision Annotation Tool. It is simple and incomplete but answers most of my need.
+
+![Alt Text](assets/yacvat.gif)
+
+## How to compile
+
+
+
 ## Things I wanted to try during this project
 
 - Making a DearImGui app so I can compare the ease of use with DearPyGui
@@ -30,4 +38,10 @@ I used code from other projects hosted on git. Run the `get_git_deps.sh` script 
 ## Planned for version 1.2
 
 - [ ] Annotation instance count displayed beside the image names;
+- [ ] Embed font in application;
+- [ ] Build also on Windows;
 - [ ] Option to start next image with the same annotation instances than the current one.
+
+## Notes
+
+- GIF generated using `gifski --fps 10 --width 320 -o anim.gif video.mp4`
