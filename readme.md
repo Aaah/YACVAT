@@ -1,12 +1,8 @@
-# README
+# YACVAT
 
-YACVAT stands for Yet Another Computer Vision Annotation Tool. It is simple and incomplete but answers most of my need.
+YACVAT stands for Yet Another Computer Vision Annotation Tool.
 
 ![Alt Text](assets/yacvat.gif)
-
-## How to compile
-
-
 
 ## Things I wanted to try during this project
 
@@ -30,10 +26,12 @@ I used code from other projects hosted on git. Run the `get_git_deps.sh` script 
 
 ## Features in current version 1.1
 
-- Define annotation types as areas or points, assign colors and labels
-- Import/export annotations using the json file format
-- Shortcuts : Use F-keys to quickly navigate and draw annotations
-- Edit annotations if needed after they're drawn by selecting them and moving them around
+- [x] Define annotation types as areas or points, assign colors and labels
+- [x] Import/export annotations using the json file format
+- [x] Shortcuts : Use F-keys to quickly navigate and draw annotations
+- [x] Edit annotations if needed after they're drawn by selecting them and moving them around
+
+Tested on Linux only for now.
 
 ## Planned for version 1.2
 
