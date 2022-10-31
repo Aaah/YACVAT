@@ -12,6 +12,7 @@
 #include <filesystem>
 #include "getopt.h"
 #include "version.h"
+#include "notofont.h"
 #include "app.h"             // context application
 #include "ImGuiFileDialog.h" // add-on filedialogs
 #include "spdlog/spdlog.h"   // logs
@@ -96,10 +97,9 @@ int ImGui_AnnotationTool(void)
 
     ImGui::EndChild();
 
-
     ImGui::PopStyleVar();
     ImGui::End();
-    
+
     return 0;
 }
 
@@ -213,7 +213,8 @@ int main(int argc, char **argv)
     // - Read 'docs/FONTS.md' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
     // io.Fonts->AddFontDefault();
-    io.Fonts->AddFontFromFileTTF("assets/NotoSans-Regular.ttf", 18.0f);
+    // io.Fonts->AddFontFromFileTTF("assets/NotoSans-Regular.ttf", 18.0f);
+    io.Fonts->AddFontFromMemoryCompressedTTF(NotoFont_compressed_data, NotoFont_compressed_size, 18.0f);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);

@@ -14,6 +14,7 @@ add_executable(yacvat main.cpp
     app.cpp 
     annotations.cpp
     rectangle.cpp
+    notofont.cpp
     lib/imgui/imgui.cpp
     lib/imgui/imgui_draw.cpp
     lib/imgui/imgui_tables.cpp
