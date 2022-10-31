@@ -26,6 +26,8 @@ I used code from other projects hosted on git. Run the `get_git_deps.sh` script 
 
 ## Features in current version 1.1
 
+This is the first released version. It can be considered as alpha since it has to be built from source and has not yet been tested by others. It has the following features :
+
 - [x] Define annotation types as areas or points, assign colors and labels
 - [x] Import/export annotations using the json file format
 - [x] Shortcuts : Use F-keys to quickly navigate and draw annotations
@@ -37,7 +39,11 @@ Tested on Linux only for now.
 
 - [ ] Annotation instance count displayed beside the image names;
 - [ ] Embed font in application;
-- [ ] Build also on Windows;
+- [ ] Build also on Windows (use Boost to handle paths);
+- [ ] Gather sources as a lib;
+- [ ] Use github to host release artefacts;
+- [ ] Package application as deb package;
+- [ ] Make annotations resizable;
 - [ ] Option to start next image with the same annotation instances than the current one.
 
 ## Notes
