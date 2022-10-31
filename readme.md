@@ -44,6 +44,7 @@ Tested on Linux only for now.
 - [ ] Use github to host release artefacts;
 - [ ] Package application as deb package;
 - [ ] Make annotations resizable;
+- [ ] Better slide when moving an annotation around (not jump to mouse cursor);
 - [ ] Option to start next image with the same annotation instances than the current one.
 
 ## Notes
