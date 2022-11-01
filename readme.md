@@ -13,16 +13,22 @@ YACVAT stands for Yet Another Computer Vision Annotation Tool.
 - Using CMake (handling dependencies)
 - Basic manipulation of images with OpenGL backend
 
-## Libraries used in this project
+## To compile
+
+### Dependencies
+
+You will need `linsdl2-dev` and cpp compiler like `g++`.
+
+### Libraries used in this project
 
 I used code from other projects hosted on git. Run the `get_git_deps.sh` script to clone them in your current folder to be able to use them. Libraries used are as follows :
 
-- [DearImGUI](https://github.com/ocornut/imgui.git)
-- [Add-on to DearImGUI to be able to handle file dialogs](https://github.com/aiekick/ImGuiFileDialog)
-- [Very complete logging library](https://github.com/gabime/spdlog)
-- [Single file library to handle images](https://github.com/nothings/stb)
-- [Json file handler](https://github.com/nlohmann/json.git)
-- [Finite State Machine](https://github.com/eglimi/cppfsm.git)
+- [DearImGUI](https://github.com/ocornut/imgui.git) : switch to branch `master`.
+- [Add-on to DearImGUI to be able to handle file dialogs](https://github.com/aiekick/ImGuiFileDialog) : switch to branch `Lib_Only`.
+- [Very complete logging library](https://github.com/gabime/spdlog) : switch to branch `v1.x`.
+- [Single file library to handle images](https://github.com/nothings/stb) : switch to branch `master`.
+- [Json file handler](https://github.com/nlohmann/json.git) : switch to branch `develop`.
+- [Finite State Machine](https://github.com/eglimi/cppfsm.git) : switch to branch `main`.
 
 ## Features in current version 1.1
 
@@ -38,7 +44,7 @@ Tested on Linux only for now.
 ## Planned for version 1.2
 
 - [ ] Annotation instance count displayed beside the image names;
-- [ ] Embed font in application;
+- [x] Embed font in application with icons;
 - [ ] Build also on Windows (use Boost to handle paths);
 - [ ] Gather sources as a lib;
 - [ ] Use github to host release artefacts;

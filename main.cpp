@@ -13,6 +13,8 @@
 #include "getopt.h"
 #include "version.h"
 #include "notofont.h"
+#include "fontawesome.h"
+#include "IconsFontAwesome4.h"
 #include "app.h"             // context application
 #include "ImGuiFileDialog.h" // add-on filedialogs
 #include "spdlog/spdlog.h"   // logs
@@ -35,7 +37,7 @@ int ImGui_AnnotationTool(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Images Menu"))
+        if (ImGui::BeginMenu(ICON_FA_PICTURE_O "  Images Menu"))
         {
             if (ImGui::MenuItem("Open folder"))
                 app.open_images_folder_flag = true;
@@ -214,7 +216,16 @@ int main(int argc, char **argv)
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
     // io.Fonts->AddFontDefault();
     // io.Fonts->AddFontFromFileTTF("assets/NotoSans-Regular.ttf", 18.0f);
+
+    // basic font
     io.Fonts->AddFontFromMemoryCompressedTTF(NotoFont_compressed_data, NotoFont_compressed_size, 18.0f);
+
+    // merge in icons from Font Awesome
+    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+    ImFontConfig icons_config;
+    icons_config.MergeMode = true;
+    icons_config.PixelSnapH = true;
+    io.Fonts->AddFontFromMemoryCompressedTTF(fontawesome_webfont_compressed_data, fontawesome_webfont_compressed_size, 16.0f, &icons_config, icons_ranges);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
     // io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
