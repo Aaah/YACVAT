@@ -26,6 +26,7 @@ public:
     void json_read(void);                        // read/write info to the annotation file
     void json_write(void);                       // read/write info to the annotation file
     void update_annotation_fsm(void);            //
+    void clear_annotations(void);                // clear all annotations
 
 private:
     std::string images_folder;            // path to valid folder containing images

@@ -641,3 +641,8 @@ void AnnotationApp::activate_annotation(long unsigned int k)
         }
     }
 }
+
+void AnnotationApp::clear_annotations(void)
+{
+    this->annotations.clear();
+}

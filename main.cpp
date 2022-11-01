@@ -79,9 +79,10 @@ int ImGui_AnnotationTool(void)
     {
         if (ImGui::BeginMenu(ICON_FA_PENCIL "  Annotations"))
         {
-            // if (ImGui::MenuItem("Open/create file"))
-            // {
-            // }
+            if (ImGui::MenuItem("Clear all"))
+            {
+                app.clear_annotations();
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
