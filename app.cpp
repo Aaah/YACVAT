@@ -9,6 +9,7 @@
 
 #include "nlohmann/json.hpp"
 #include <fstream>
+#include "IconsFontAwesome4.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -36,8 +37,8 @@ void AnnotationApp::ui_annotations_panel(void)
 
     if (ImGui::BeginTable("table_annotations", 5, flags))
     {
-        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn(ICON_FA_KEYBOARD_O, ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn(ICON_FA_PAINT_BRUSH, ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
@@ -107,7 +108,7 @@ void AnnotationApp::ui_annotations_panel(void)
             ImGui::PopItemWidth();
 
             ImGui::TableSetColumnIndex(4);
-            sprintf(_unused_ids, "-##delbuttont%ld", n);
+            sprintf(_unused_ids, ICON_FA_MINUS_CIRCLE "##delbuttont%ld", n);
             if (ImGui::Button(_unused_ids))
             {
                 this->annotations.erase(this->annotations.begin() + n);
@@ -118,7 +119,7 @@ void AnnotationApp::ui_annotations_panel(void)
     }
 
     // add new annotation
-    if (ImGui::Button("+"))
+    if (ImGui::Button(ICON_FA_PLUS_CIRCLE))
     {
         this->annotations.push_back(Annotation("new label"));
         update_json_flag = true;
@@ -169,7 +170,7 @@ void AnnotationApp::ui_annotations_panel(void)
                     }
 
                     ImGui::TableSetColumnIndex(1);
-                    sprintf(_unused_ids, "-##delbuttontinst%ldx%ld", n, m);
+                    sprintf(_unused_ids, ICON_FA_MINUS_CIRCLE "##delbuttontinst%ldx%ld", n, m);
                     if (ImGui::Button(_unused_ids))
                     {
                         this->annotations[n].inst.erase(this->annotations[n].inst.begin() + m);

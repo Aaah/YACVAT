@@ -77,7 +77,7 @@ int ImGui_AnnotationTool(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Annotations"))
+        if (ImGui::BeginMenu(ICON_FA_PENCIL "  Annotations"))
         {
             // if (ImGui::MenuItem("Open/create file"))
             // {
