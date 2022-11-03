@@ -37,7 +37,7 @@ int ImGui_AnnotationTool(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu(ICON_FA_PICTURE_O "  Images Menu"))
+        if (ImGui::BeginMenu(ICON_FA_FILE_IMAGE_O "  Images Menu"))
         {
             if (ImGui::MenuItem("Open folder"))
                 app.open_images_folder_flag = true;

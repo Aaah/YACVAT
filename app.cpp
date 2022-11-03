@@ -41,7 +41,7 @@ void AnnotationApp::ui_annotations_panel(void)
         ImGui::TableSetupColumn(ICON_FA_PAINT_BRUSH, ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn(ICON_FA_TRASH, ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableHeadersRow();
 
         static char _unused_ids[64] = "";
@@ -119,7 +119,7 @@ void AnnotationApp::ui_annotations_panel(void)
     }
 
     // add new annotation
-    if (ImGui::Button(ICON_FA_PLUS_CIRCLE))
+    if (ImGui::Button(ICON_FA_PLUS_CIRCLE "  Create new label"))
     {
         this->annotations.push_back(Annotation("new label"));
         update_json_flag = true;
@@ -132,7 +132,7 @@ void AnnotationApp::ui_annotations_panel(void)
     if (ImGui::BeginTable("table_annotations_inst", 2, flags))
     {
         ImGui::TableSetupColumn("Instances", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn(" ", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn(ICON_FA_TRASH, ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableHeadersRow();
 
         static char _unused_ids[64] = "";
@@ -201,8 +201,13 @@ void AnnotationApp::json_write(void)
         fs.close();
     }
 
-    nlohmann::json json_data;
+    // reset annotation count per file to reparse the structure as it is exported
+    for (auto it = this->ninstperimage.begin(); it != this->ninstperimage.end(); ++it)
+    {
+        it->second = 0;
+    }
 
+    nlohmann::json json_data;
     for (long unsigned n = 0; n < this->annotations.size(); n++)
     {
         // config
@@ -222,6 +227,8 @@ void AnnotationApp::json_write(void)
                     {"x_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().x / this->scale}, // x end coordinates
                     {"y_end", this->annotations[n].inst[m].rect_on_image.get_bottomright_vertex().y / this->scale}  // y end coordinates
                 }));
+
+            this->ninstperimage[this->annotations[n].inst[m].img_fname] = this->ninstperimage[this->annotations[n].inst[m].img_fname] + 1;
         }
     }
 
@@ -244,6 +251,7 @@ void AnnotationApp::json_read(void)
 
     // empty list of annotations
     this->annotations.clear();
+    this->ninstperimage.clear();
 
     // extract annotations
     for (nlohmann::json::iterator i = json.begin(); i != json.end(); ++i)
@@ -286,13 +294,15 @@ void AnnotationApp::json_read(void)
             {
                 // create a new instance
                 AnnotationInstance _inst = AnnotationInstance();
+                auto val = j.value();
 
                 // retrieve file name
-                auto val = j.value();
                 _inst.img_fname = val["file"].get<std::string>();
 
+                // update dictionary counting instances per image
+                this->ninstperimage[_inst.img_fname] = this->ninstperimage[_inst.img_fname] + 1;
+
                 // retrieve corner positions of the instance
-                // todo : handle scale, dunno why it's not working
                 float x_start = val["x_start"].get<float>() * this->scale;
                 float y_start = val["y_start"].get<float>() * this->scale;
                 float x_end = val["x_end"].get<float>() * this->scale;
@@ -315,38 +325,54 @@ void AnnotationApp::json_read(void)
             }
         }
     }
-
-    // todo : parse annotations instances
 }
 
 void AnnotationApp::ui_images_folder(void)
 {
     int n = 0;
     static int selected = -1;
-    for (auto e : this->image_files)
+
+    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
+
+    if (ImGui::BeginTable("table_images", 2, flags))
     {
-        // single selectable to display filenames
-        if (ImGui::Selectable(e.c_str(), selected == n))
+        ImGui::TableSetupColumn(ICON_FA_STICKY_NOTE, ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn(ICON_FA_PICTURE_O "  Pictures", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+
+        for (auto e : this->image_files)
         {
-            selected = n;
 
-            // create full filename
-            // todo : use boost lib
-            std::string fn = this->images_folder + "/" + e;
-            spdlog::debug("Loading image in RAM : {}", fn);
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%d", this->ninstperimage[e]);
 
-            // current_image_texture = 0;
-            current_image_width = 0;
-            current_image_height = 0;
-            current_image_texture = 0;
-            bool ret = this->read_image(fn.c_str(), &current_image_texture, &current_image_width, &current_image_height);
-            IM_ASSERT(ret);
+            // single selectable to display filenames
+            ImGui::TableSetColumnIndex(1);
+            if (ImGui::Selectable(e.c_str(), selected == n))
+            {
+                selected = n;
 
-            this->scale = 0.0;
-            this->image_fname = e;
-            this->compute_scale_flag = true;
+                // create full filename
+                // todo : use boost lib
+                std::string fn = this->images_folder + "/" + e;
+                spdlog::debug("Loading image in RAM : {}", fn);
+
+                // current_image_texture = 0;
+                current_image_width = 0;
+                current_image_height = 0;
+                current_image_texture = 0;
+                bool ret = this->read_image(fn.c_str(), &current_image_texture, &current_image_width, &current_image_height);
+                IM_ASSERT(ret);
+
+                this->scale = 0.0;
+                this->image_fname = e;
+                this->compute_scale_flag = true;
+            }
+            n++;
         }
-        n++;
+
+        ImGui::EndTable();
     }
 }
 
@@ -568,7 +594,16 @@ void AnnotationApp::update_images_folder(std::string path)
 
             if (this->ext_set.find(extension) != this->ext_set.end())
             {
+                // add image to the set
                 this->image_files.push_back(fn);
+
+                // create entry in dictionary counting instances
+                if (this->ninstperimage.find(fn) == this->ninstperimage.end())
+                {
+                    this->ninstperimage[fn] = 0;
+                }
+
+                // -- log
                 spdlog::info("File added : {}", diread->d_name);
             }
         }
@@ -645,4 +680,5 @@ void AnnotationApp::activate_annotation(long unsigned int k)
 void AnnotationApp::clear_annotations(void)
 {
     this->annotations.clear();
+    this->ninstperimage.clear();
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 #include <fstream>
+#include <map>
 
 #include <SDL_opengl.h>
 #include "annotations.h"
@@ -29,28 +30,24 @@ public:
     void clear_annotations(void);                // clear all annotations
 
 private:
-    std::string images_folder;            // path to valid folder containing images
-    std::vector<std::string> image_files; // list of valid images in the folder
-    std::vector<int> annotation_count;    // number of annotation on the current image
-    std::set<std::string> ext_set;        // list of extensions accepted as images
-    GLuint current_image_texture;         // opengl texture for the loaded image
-    int current_image_width;              // width of the picture
-    int current_image_height;             // height of the picture
-    float scale;                          // scaling factor on the displayed image
-    std::vector<Annotation> annotations;  // list of annotations available
-    std::fstream fs;                      // file pointer to the annotation file
-    std::string annotation_fname;         // full path
-    std::string image_fname;              // currently opened image file name
-    nlohmann::json json;                  // json data structure
-    bool compute_scale_flag;              // compute scale factor to resize image
+    std::string images_folder;                // path to valid folder containing images
+    std::vector<std::string> image_files;     // list of valid images in the folder
+    std::vector<int> annotation_count;        // number of annotation on the current image
+    std::set<std::string> ext_set;            // list of extensions accepted as images
+    GLuint current_image_texture;             // opengl texture for the loaded image
+    int current_image_width;                  // width of the picture
+    int current_image_height;                 // height of the picture
+    float scale;                              // scaling factor on the displayed image
+    std::vector<Annotation> annotations;      // list of annotations available
+    std::fstream fs;                          // file pointer to the annotation file
+    std::string annotation_fname;             // full path
+    std::string image_fname;                  // currently opened image file name
+    nlohmann::json json;                      // json data structure
+    bool compute_scale_flag;                  // compute scale factor to resize image
+    std::map<std::string, int> ninstperimage; // dict to count the number of instances per image
 
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);
-    void ui_annotations_continue(void);            // ui panel if an annotations file exists
-    void ui_annotations_setup(void);               // ui panel if no annotations file exists
     void check_annotations_file(void);             // look for the presence of an annotations file
-    void json_update_annoations(void);             // create annotations file (with labels and types)
-    void json_update_header(void);                 // create annotations file (with labels and types)
-    void json_parse_header(void);                  // create annotations file (with labels and types)
     void activate_annotation(long unsigned int n); // activate annotation n and deactivate all others
 };
 

@@ -43,7 +43,7 @@ Tested on Linux only for now.
 
 ## Planned for version 1.2
 
-- [ ] Annotation instance count displayed beside the image names;
+- [x] Annotation instance count displayed by the image names;
 - [x] Embed font in application with icons;
 - [ ] Build also on Windows (use Boost to handle paths);
 - [ ] Gather sources as a lib;
