@@ -1,6 +1,6 @@
 #include <cmath>
 #include "imgui.h"
-#include "rectangle.h"
+#include "yacvat/rectangle.h"
 
 // to enable basic instanciation inside another class
 Rectangle::Rectangle(void)

@@ -1,15 +1,14 @@
-#include "app.h"
+#include "yacvat/app.h"
+#include "yacvat/IconsFontAwesome4.h"
 #include "spdlog/spdlog.h"
 #include "imgui.h"
+#include "nlohmann/json.hpp"
 
 #include <iostream>
 #include <vector>
 #include <dirent.h>
 #include <set>
-
-#include "nlohmann/json.hpp"
 #include <fstream>
-#include "IconsFontAwesome4.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"

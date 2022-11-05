@@ -46,8 +46,8 @@ Tested on Linux only for now.
 - [x] Annotation instance count displayed by the image names;
 - [x] Embed font in application with icons;
 - [ ] Build also on Windows (use Boost to handle paths);
-- [ ] Gather sources as a lib;
-- [ ] Use github to host release artefacts;
+- [x] Gather sources as a lib using "proper" cmake design patterns;
+- [x] Use github to host release artefacts;
 - [ ] Package application as deb package;
 - [ ] Make annotations resizable;
 - [ ] Better slide when moving an annotation around (not jump to mouse cursor);
@@ -56,3 +56,5 @@ Tested on Linux only for now.
 ## Notes
 
 - GIF generated using `gifski --fps 10 --width 320 -o anim.gif video.mp4`
+- project structured based on [their recommandations](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
+

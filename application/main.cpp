@@ -1,23 +1,24 @@
+#include "yacvat/version.h"
+#include "yacvat/notofont.h"
+#include "yacvat/fontawesome.h"
+#include "yacvat/IconsFontAwesome4.h"
+#include "yacvat/app.h"     
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "ImGuiFileDialog.h" // add-on filedialogs
+#include "spdlog/spdlog.h"   // logs
+
+#include <filesystem>
 #include <stdio.h>
+#include "getopt.h"
 #include <SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
 #include <SDL_opengl.h>
 #endif
-
-#include <filesystem>
-#include "getopt.h"
-#include "version.h"
-#include "notofont.h"
-#include "fontawesome.h"
-#include "IconsFontAwesome4.h"
-#include "app.h"             // context application
-#include "ImGuiFileDialog.h" // add-on filedialogs
-#include "spdlog/spdlog.h"   // logs
 
 // context application
 AnnotationApp app;
