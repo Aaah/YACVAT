@@ -23,4 +23,11 @@ target_compile_options(yacvat PRIVATE -std=c++11 -g -Wall -Wformat)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+
+install(TARGETS yacvat
+    COMPONENT aaah
+)
+
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "KK") #required
+INCLUDE(CPack)

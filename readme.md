@@ -13,22 +13,28 @@ YACVAT stands for Yet Another Computer Vision Annotation Tool.
 - Using CMake (handling dependencies)
 - Basic manipulation of images with OpenGL backend
 
-## To compile
+## HOW TO
 
-### Dependencies
+### ... to compile yourself
 
-You will need `linsdl2-dev` and cpp compiler like `g++`.
+- You will need `linsdl2-dev` and cpp compiler like `g++`;
+- Run the `get_git_deps.sh` script to clone external repositories required;
+- Run the following commands :
 
-### Libraries used in this project
+`
+mkdir build
+cd build
+cmake ..
+make
+`
 
-I used code from other projects hosted on git. Run the `get_git_deps.sh` script to clone them in your current folder to be able to use them. Libraries used are as follows :
+### Create and install `deb` package
 
-- [DearImGUI](https://github.com/ocornut/imgui.git) : switch to branch `master`.
-- [Add-on to DearImGUI to be able to handle file dialogs](https://github.com/aiekick/ImGuiFileDialog) : switch to branch `Lib_Only`.
-- [Very complete logging library](https://github.com/gabime/spdlog) : switch to branch `v1.x`.
-- [Single file library to handle images](https://github.com/nothings/stb) : switch to branch `master`.
-- [Json file handler](https://github.com/nlohmann/json.git) : switch to branch `develop`.
-- [Finite State Machine](https://github.com/eglimi/cppfsm.git) : switch to branch `main`.
+`
+cd build
+cpack
+dpkg -i Yacvat-x.y.z-Linux.deb
+`
 
 ## Features in current version 1.1
 
@@ -45,16 +51,26 @@ Tested on Linux only for now.
 
 - [x] Annotation instance count displayed by the image names;
 - [x] Embed font in application with icons;
-- [ ] Build also on Windows (use Boost to handle paths);
 - [x] Gather sources as a lib using "proper" cmake design patterns;
 - [x] Use github to host release artefacts;
-- [ ] Package application as deb package;
+- [x] Package application as deb package;
+- [ ] Build also on Windows (use Boost to handle paths);
 - [ ] Make annotations resizable;
 - [ ] Better slide when moving an annotation around (not jump to mouse cursor);
 - [ ] Option to start next image with the same annotation instances than the current one.
 
+## Libraries used in this project
+
+I used code from other projects hosted on git. Run the `get_git_deps.sh` script to clone them in your current folder to be able to use them. Libraries used are as follows :
+
+- [DearImGUI](https://github.com/ocornut/imgui.git) : switch to branch `master`.
+- [Add-on to DearImGUI to be able to handle file dialogs](https://github.com/aiekick/ImGuiFileDialog) : switch to branch `Lib_Only`.
+- [Very complete logging library](https://github.com/gabime/spdlog) : switch to branch `v1.x`.
+- [Single file library to handle images](https://github.com/nothings/stb) : switch to branch `master`.
+- [Json file handler](https://github.com/nlohmann/json.git) : switch to branch `develop`.
+- [Finite State Machine](https://github.com/eglimi/cppfsm.git) : switch to branch `main`.
+  
 ## Notes
 
 - GIF generated using `gifski --fps 10 --width 320 -o anim.gif video.mp4`
 - project structured based on [their recommandations](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
-
