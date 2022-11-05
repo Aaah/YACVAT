@@ -15,26 +15,26 @@ YACVAT stands for Yet Another Computer Vision Annotation Tool.
 
 ## HOW TO
 
-### ... to compile yourself
+### ... compile yourself
 
 - You will need `linsdl2-dev` and cpp compiler like `g++`;
 - Run the `get_git_deps.sh` script to clone external repositories required;
 - Run the following commands :
 
-`
+```shell
 mkdir build
 cd build
 cmake ..
 make
-`
+```
 
-### Create and install `deb` package
+### ... create and install `deb` package
 
-`
+```shell
 cd build
 cpack
 dpkg -i Yacvat-x.y.z-Linux.deb
-`
+```
 
 ## Features in current version 1.1
 
@@ -73,4 +73,4 @@ I used code from other projects hosted on git. Run the `get_git_deps.sh` script 
 ## Notes
 
 - GIF generated using `gifski --fps 10 --width 320 -o anim.gif video.mp4`
-- project structured based on [their recommandations](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
+- Project structured based on [their recommandations](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
