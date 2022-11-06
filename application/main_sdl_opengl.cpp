@@ -1,13 +1,9 @@
 #include "yacvat/version.h"
-#include "yacvat/notofont.h"
-#include "yacvat/fontawesome.h"
-#include "yacvat/IconsFontAwesome4.h"
 #include "yacvat/app.h"     
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include "ImGuiFileDialog.h" // add-on filedialogs
 #include "spdlog/spdlog.h"   // logs
 
 #include <filesystem>
@@ -22,90 +18,6 @@
 
 // context application
 AnnotationApp app;
-
-int ImGui_AnnotationTool(void)
-{
-    // todo : resize panels when resizing the window
-
-    ImGuiViewport *viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->WorkPos);
-    ImGui::SetNextWindowSize(viewport->WorkSize);
-    ImGui::Begin("Annotation Tool", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
-
-    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-
-    ImGui::BeginChild("Pane2", ImVec2(200, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
-
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu(ICON_FA_FILE_IMAGE_O "  Images Menu"))
-        {
-            if (ImGui::MenuItem("Open folder"))
-                app.open_images_folder_flag = true;
-
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-
-    if (app.open_images_folder_flag == true)
-    {
-        ImGuiFileDialog::Instance()->OpenDialog("FolderChooser", "Choose a Directory", nullptr, ".", ImGuiFileDialogFlags_Modal);
-
-        // display
-        if (ImGuiFileDialog::Instance()->Display("FolderChooser"))
-        {
-            // action if OK
-            if (ImGuiFileDialog::Instance()->IsOk())
-            {
-                app.update_images_folder(ImGuiFileDialog::Instance()->GetCurrentPath());
-            }
-
-            // close
-            ImGuiFileDialog::Instance()->Close();
-            app.open_images_folder_flag = false;
-        }
-    }
-
-    // display images files
-    app.ui_images_folder();
-
-    ImGui::EndChild();
-
-    ImGui::SameLine();
-
-    ImGui::BeginChild("Pane3", ImVec2(300, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
-
-    if (ImGui::BeginMenuBar())
-    {
-        if (ImGui::BeginMenu(ICON_FA_PENCIL "  Annotations"))
-        {
-            if (ImGui::MenuItem("Clear all"))
-            {
-                app.clear_annotations();
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-
-    app.ui_annotations_panel();
-
-    ImGui::EndChild();
-
-    ImGui::SameLine();
-
-    ImGui::BeginChild("Pane1", ImVec2(-1.f, -1.f), false, ImGuiWindowFlags_AlwaysAutoResize);
-
-    app.ui_image_current();
-
-    ImGui::EndChild();
-
-    ImGui::PopStyleVar();
-    ImGui::End();
-
-    return 0;
-}
 
 // Main code
 int main(int argc, char **argv)
@@ -201,38 +113,13 @@ int main(int argc, char **argv)
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    // ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("assets/NotoSans-Regular.ttf", 18.0f);
-
-    // basic font
-    io.Fonts->AddFontFromMemoryCompressedTTF(NotoFont_compressed_data, NotoFont_compressed_size, 18.0f);
-
-    // merge in icons from Font Awesome
-    static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-    ImFontConfig icons_config;
-    icons_config.MergeMode = true;
-    icons_config.PixelSnapH = true;
-    io.Fonts->AddFontFromMemoryCompressedTTF(fontawesome_webfont_compressed_data, fontawesome_webfont_compressed_size, 16.0f, &icons_config, icons_ranges);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    // IM_ASSERT(font != NULL);
+    // setup graphical basics
+    app.ui_initialize();
 
     // Our state
     bool show_demo_window = false;
@@ -264,9 +151,6 @@ int main(int argc, char **argv)
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        // to enable dragging on the image without moving the window around
-        io.ConfigWindowsMoveFromTitleBarOnly = true;
-
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
@@ -274,7 +158,8 @@ int main(int argc, char **argv)
         if (show_metrics)
             ImGui::ShowMetricsWindow(&show_metrics);
 
-        ImGui_AnnotationTool();
+        // render main app window
+        app.ui_main_window();
 
         // Rendering
         ImGui::Render();

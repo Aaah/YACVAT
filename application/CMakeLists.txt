@@ -4,7 +4,7 @@ find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
 
-add_executable(yacvat main.cpp)
+add_executable(yacvat main_sdl_opengl.cpp)
 
 target_include_directories(yacvat PRIVATE 
 ../extern/imgui/ 
