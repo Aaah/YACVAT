@@ -165,13 +165,13 @@ void AnnotationInstance::update(void)
             {
                 // update flag are set to trigger processing when the drag stops
                 this->dragging_flag = true;                  // now dragging
-                this->offset = this->rect.get_center() + _m; // offset between mouse and center of box
+                this->offset = this->rect.get_center() - _m; // offset between mouse and center of box
             }
 
             if (this->dragging_flag == true)
             {
                 // update the center of the rectangle on the screen to follow the mouse cursor
-                this->rect.set_center(_m);
+                this->rect.set_center(_m + this->offset);
 
                 if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
                 {

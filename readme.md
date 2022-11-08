@@ -56,7 +56,7 @@ Tested on Linux only for now.
 - [x] Package application as deb package;
 - [ ] Build also on Windows (use Boost to handle paths);
 - [ ] Make annotations resizable;
-- [ ] Better slide when moving an annotation around (not jump to mouse cursor);
+- [x] Better slide when moving an annotation around (not jump to mouse cursor);
 - [ ] Option to start next image with the same annotation instances than the current one.
 
 ## Libraries used in this project

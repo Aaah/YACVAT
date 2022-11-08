@@ -1,6 +1,8 @@
 #ifndef __VEC2_H__
 #define __VEC2_H__
 
+// custom made to replace ImVec2 which do not support operators (+, -...)
+
 #include <cmath>
 
 template <class T>
