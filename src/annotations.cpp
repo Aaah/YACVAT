@@ -48,8 +48,8 @@ AnnotationInstance::AnnotationInstance(void)
         {HoverStates::OUTSIDE, HoverStates::HOVER, "from_outside_to_hover", nullptr, nullptr},
     });
 
-    this->outer_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
-    this->inner_rect = Rectangle(ImVec2(0, 0), ImVec2(0, 0));
+    this->outer_rect = Rectangle(vec2f(0, 0), vec2f(0, 0));
+    this->inner_rect = Rectangle(vec2f(0, 0), vec2f(0, 0));
     this->delta = 10.0;
     this->selected = false;
 }
@@ -58,7 +58,7 @@ void AnnotationInstance::update_bounding_box(void)
 {
     // outer rect on screen
     this->outer_rect.set_center(this->rect.get_center());
-    ImVec2 span = this->rect.get_span();
+    vec2f span = this->rect.get_span();
     span.x += this->delta;
     span.y += this->delta;
     this->outer_rect.set_span(span);
@@ -89,7 +89,7 @@ void AnnotationInstance::set_color(float color[4])
 
 void AnnotationInstance::update(void)
 {
-    ImVec2 _w = ImGui::GetWindowPos();
+    vec2f _w = ImGui::GetWindowPos();
     bool update_flag = false;
     if ((_w.x != this->window_pos.x) || (_w.y != this->window_pos.y))
     {
@@ -100,11 +100,11 @@ void AnnotationInstance::update(void)
     vec2<float> _m = ImGui::GetMousePos();
 
     // compute absolute coodinates of the start vertex
-    ImVec2 _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
-    ImVec2 _rect_on_image_bottomright = this->rect_on_image.get_bottomright_vertex();
+    vec2f _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
+    vec2f _rect_on_image_bottomright = this->rect_on_image.get_bottomright_vertex();
 
     if (update_flag == true)
-        this->rect.set_topleft_vertex(ImVec2(window_pos.x + _rect_on_image_topleft.x, window_pos.y + _rect_on_image_topleft.y));
+        this->rect.set_topleft_vertex(vec2f(window_pos.x + _rect_on_image_topleft.x, window_pos.y + _rect_on_image_topleft.y));
 
     // update HOVER fsm
     if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(_m))
@@ -137,7 +137,7 @@ void AnnotationInstance::update(void)
 
         // position on screen of the end vertex
         if (update_flag == true)
-            this->rect.set_bottomright_vertex(ImVec2(_rect_on_image_bottomright.x + window_pos.x, _rect_on_image_bottomright.y + window_pos.y));
+            this->rect.set_bottomright_vertex(vec2f(_rect_on_image_bottomright.x + window_pos.x, _rect_on_image_bottomright.y + window_pos.y));
 
         if (this->status_fsm.state() == StatusStates::IDLE)
         {
@@ -175,13 +175,10 @@ void AnnotationInstance::update(void)
 
                 if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
                 {
-                    update_flag = true;                      // request bounding box update
-                    this->dragging_flag = false;             // reset the processing flag
-                    this->request_json_write = true;         // request a json dump
-                    ImVec2 center = this->rect.get_center(); // update the rect on image
-                    center.x -= this->window_pos.x;
-                    center.y -= this->window_pos.y;
-                    this->rect_on_image.set_center(center);
+                    update_flag = true;                                                         // request bounding box update
+                    this->dragging_flag = false;                                                // reset the processing flag
+                    this->request_json_write = true;                                            // request a json dump
+                    this->rect_on_image.set_center(this->rect.get_center() - this->window_pos); // update position
                 }
             }
             // todo : edit single side on hover + drag + edge detection

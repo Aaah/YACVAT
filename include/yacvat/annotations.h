@@ -71,9 +71,9 @@ public:
     bool request_json_write;                                              // has the isntance been update in a way that requires a json dump
 
 private:
-    vec2<float> offset;   // mouse to box center off when starting to drag
+    vec2f offset;         // mouse to box center off when starting to drag
     int delta;            // offset to compute bounding boxes from the actual annotation box
-    ImVec2 window_pos;    // window position on screen
+    vec2f window_pos;     // window position on screen
     Rectangle rect;       // actual annotation box on screen
     Rectangle outer_rect; // bounding box to detect mouse hover
     Rectangle inner_rect; // bounding box to detect mouse hover

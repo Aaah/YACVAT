@@ -153,7 +153,6 @@ void AnnotationApp::ui_main_window(void)
     ImGui::End();
 }
 
-
 void AnnotationApp::ui_annotations_panel(void)
 {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
@@ -435,8 +434,8 @@ void AnnotationApp::json_read(void)
 
                 // spdlog::debug("[{}, {}, {}, {}] * {}", x_start, y_start, x_end, y_end, this->scale);
 
-                _inst.rect_on_image.set_bottomright_vertex(ImVec2(x_end, y_end));
-                _inst.rect_on_image.set_topleft_vertex(ImVec2(x_start, y_start));
+                _inst.rect_on_image.set_bottomright_vertex(vec2f(x_end, y_end));
+                _inst.rect_on_image.set_topleft_vertex(vec2f(x_start, y_start));
 
                 // retrieve color
                 for (int k = 0; k < 4; k++)
@@ -562,9 +561,9 @@ void AnnotationApp::ui_image_current()
 
 void AnnotationApp::update_annotation_fsm(void)
 {
-    ImVec2 _w = ImGui::GetWindowPos();
-    ImVec2 _m = ImGui::GetMousePos();
-    ImVec2 cursor_pos = ImVec2(_m.x - _w.x, _m.y - _w.y);
+    vec2f _w = ImGui::GetWindowPos();
+    vec2f _m = ImGui::GetMousePos();
+    vec2f cursor_pos = _m - _w;
 
     bool create_new_instance_flag = true; // if true, will create a new instance of the active annotation
     bool create_state_flag = false;       // if true, fsm is creating and rendering the annotation instance
@@ -648,7 +647,7 @@ void AnnotationApp::update_annotation_fsm(void)
         {
             // POINT : set center at mouse cursor and switch to idle
             this->annotations[active_annotation].inst[active_instance].rect_on_image.set_center(cursor_pos);
-            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_span(ImVec2(10, 10));
+            this->annotations[active_annotation].inst[active_instance].rect_on_image.set_span(vec2f(10, 10));
             this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
             this->annotations[active_annotation].inst[active_instance].update();
             this->annotations[active_annotation].inst[active_instance].update_bounding_box();
