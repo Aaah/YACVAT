@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include "vec2.h"
+#define IMGUI_USER_CONFIG "yacvat/yacvat_imgui_config.h"
+
 #include "fsm.h"
 #include "imgui.h"
 #include "rectangle.h"
@@ -53,8 +56,8 @@ public:
     AnnotationInstance(void);          // init
     void set_fname(std::string fname); // set file name
     void set_color(float color[4]);    // set color
-    void draw_area(void);                   // draw itself on picture
-    void draw_point(void);                   // draw itself on picture
+    void draw_area(void);              // draw itself on picture
+    void draw_point(void);             // draw itself on picture
     void update(void);                 // update fsm
     void update_bounding_box(void);    // update inner and outer hover box;
 
@@ -68,6 +71,7 @@ public:
     bool request_json_write;                                              // has the isntance been update in a way that requires a json dump
 
 private:
+    vec2<float> offset;   // mouse to box center off when starting to drag
     int delta;            // offset to compute bounding boxes from the actual annotation box
     ImVec2 window_pos;    // window position on screen
     Rectangle rect;       // actual annotation box on screen

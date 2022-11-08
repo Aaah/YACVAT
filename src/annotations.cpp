@@ -97,7 +97,7 @@ void AnnotationInstance::update(void)
         this->window_pos = _w;
     }
 
-    ImVec2 _m = ImGui::GetMousePos();
+    vec2<float> _m = ImGui::GetMousePos();
 
     // compute absolute coodinates of the start vertex
     ImVec2 _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
@@ -161,10 +161,11 @@ void AnnotationInstance::update(void)
             }
 
             // drag instance around in the image
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE))
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE) && (this->dragging_flag == false))
             {
                 // update flag are set to trigger processing when the drag stops
-                this->dragging_flag = true;
+                this->dragging_flag = true;                  // now dragging
+                this->offset = this->rect.get_center() + _m; // offset between mouse and center of box
             }
 
             if (this->dragging_flag == true)

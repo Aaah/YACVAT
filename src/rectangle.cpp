@@ -1,5 +1,4 @@
 #include <cmath>
-#include "imgui.h"
 #include "yacvat/rectangle.h"
 
 // to enable basic instanciation inside another class
@@ -7,7 +6,7 @@ Rectangle::Rectangle(void)
 {
 }
 
-Rectangle::Rectangle(ImVec2 start, ImVec2 end)
+Rectangle::Rectangle(vec2<float> start, vec2<float> end)
 {
     set_topleft_vertex(start);
     set_bottomright_vertex(end);
@@ -22,7 +21,7 @@ bool Rectangle::intersect(Rectangle rect)
     return false;
 }
 
-bool Rectangle::inside(ImVec2 point)
+bool Rectangle::inside(vec2<float> point)
 {
     if ((2.0 * std::abs(point.x - center.x) < span.x) && (2.0 * std::abs(point.y - center.y) < span.y))
     {
@@ -31,7 +30,7 @@ bool Rectangle::inside(ImVec2 point)
     return false;
 }
 
-void Rectangle::set_center(ImVec2 point)
+void Rectangle::set_center(vec2<float> point)
 {
     // when setting the center, the span remains the same
     center = point;
@@ -43,7 +42,7 @@ void Rectangle::set_center(ImVec2 point)
     bottomright_vertex.y = center.y + span.y / 2.0;
 }
 
-void Rectangle::set_span(ImVec2 point)
+void Rectangle::set_span(vec2<float> point)
 {
     // when setting the span, the center remains the same
     span = point;
@@ -55,7 +54,7 @@ void Rectangle::set_span(ImVec2 point)
     bottomright_vertex.y = center.y + span.y / 2.0;
 }
 
-void Rectangle::set_topleft_vertex(ImVec2 point)
+void Rectangle::set_topleft_vertex(vec2<float> point)
 {
     // when setting one vertex, the second remains the same
     topleft_vertex = point;
@@ -67,7 +66,7 @@ void Rectangle::set_topleft_vertex(ImVec2 point)
     center.y = (topleft_vertex.y + bottomright_vertex.y) / 2.0;
 }
 
-void Rectangle::set_bottomright_vertex(ImVec2 point)
+void Rectangle::set_bottomright_vertex(vec2<float> point)
 {
     // when setting one vertex, the second remains the same
     if ((point.x < topleft_vertex.x) && (point.y < topleft_vertex.y))

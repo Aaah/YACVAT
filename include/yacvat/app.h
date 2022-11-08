@@ -41,7 +41,7 @@ private:
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);
     void check_annotations_file(void);             // look for the presence of an annotations file
     void activate_annotation(long unsigned int n); // activate annotation n and deactivate all others
-    void update_images_folder(std::string path);   // list image files
+    void parse_images_folder(std::string path);   // list image files
     void ui_images_folder(void);                   // draw the UI to displays files
     void ui_image_current(void);                   // display current image
     void ui_annotations_panel(void);               // create/edit annotations type

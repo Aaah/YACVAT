@@ -3,6 +3,7 @@
 #include "yacvat/notofont.h"
 #include "yacvat/fontawesome.h"
 #include "yacvat/IconsFontAwesome4.h"
+#include "yacvat/vec2.h"
 
 #include "spdlog/spdlog.h"
 #include "imgui.h"
@@ -105,7 +106,7 @@ void AnnotationApp::ui_main_window(void)
             // action if OK
             if (ImGuiFileDialog::Instance()->IsOk())
             {
-                this->update_images_folder(ImGuiFileDialog::Instance()->GetCurrentPath());
+                this->parse_images_folder(ImGuiFileDialog::Instance()->GetCurrentPath());
             }
 
             // close
@@ -687,7 +688,7 @@ void AnnotationApp::check_annotations_file(void)
     spdlog::debug("checking existence of annotation file : {}", this->annotations_file_exists);
 }
 
-void AnnotationApp::update_images_folder(std::string path)
+void AnnotationApp::parse_images_folder(std::string path)
 {
     DIR *dir;
     struct dirent *diread;
