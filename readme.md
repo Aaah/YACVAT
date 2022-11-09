@@ -55,7 +55,7 @@ Tested on Linux only for now.
 - [x] Use github to host release artefacts;
 - [x] Package application as deb package;
 - [ ] Build also on Windows (use Boost to handle paths);
-- [ ] Make annotations resizable;
+- [x] Make annotations resizable;
 - [x] Better slide when moving an annotation around (not jump to mouse cursor);
 - [ ] Option to start next image with the same annotation instances than the current one.
 
@@ -74,3 +74,4 @@ I used code from other projects hosted on git. Run the `get_git_deps.sh` script 
 
 - GIF generated using `gifski --fps 10 --width 320 -o anim.gif video.mp4`
 - Project structured based on [their recommandations](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
+- Used custom vec2 types instead of ImVec2 for operators : see `vec2.h` and `yacvat_imgui_config.h`

@@ -86,7 +86,7 @@ void AnnotationApp::ui_main_window(void)
 
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu(ICON_FA_FILE_IMAGE_O "  Images Menu"))
+        if (ImGui::BeginMenu("Images Menu"))
         {
             if (ImGui::MenuItem("Open folder"))
                 this->open_images_folder_flag = true;

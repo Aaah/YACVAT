@@ -160,17 +160,51 @@ void AnnotationInstance::update(void)
                 spdlog::debug("EDIT : cancelling current action");
             }
 
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) &&       // left click
+                (this->hover_fsm.state() == HoverStates::HOVER) && // on the edge
+                (this->resizing_dir == Direction::NONE) &&         // no direction set yet
+                (this->dragging_flag == false)                     // not dragging
+            )
+            {
+                // update flag are set to trigger processing when the drag stops
+                vec2f _br = this->rect.get_bottomright_vertex();
+                vec2f _tl = this->rect.get_topleft_vertex();
+                float rad = 10;
+                if (std::abs(_m.x - _br.x) < rad)
+                {
+                    this->resizing_dir = Direction::RIGHT;
+                }
+                else if (std::abs(_m.x - _tl.x) < rad)
+                {
+                    this->resizing_dir = Direction::LEFT;
+                }
+                else if (std::abs(_m.y - _br.y) < rad)
+                {
+                    this->resizing_dir = Direction::DOWN;
+                }
+                else
+                {
+                    this->resizing_dir = Direction::UP;
+                }
+
+                spdlog::debug("RESIZING direction : {}", int(this->resizing_dir));
+            }
+
             // drag instance around in the image
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::INSIDE) && (this->dragging_flag == false))
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) &&        // left click
+                (this->hover_fsm.state() == HoverStates::INSIDE) && // inside the box
+                (this->dragging_flag == false) &&                   // not dragging yet
+                (this->resizing_dir == Direction::NONE)             // not resizing
+            )
             {
                 // update flag are set to trigger processing when the drag stops
                 this->dragging_flag = true;                  // now dragging
                 this->offset = this->rect.get_center() - _m; // offset between mouse and center of box
             }
 
+            // DRAG MODE : update the center of the rectangle on the screen to follow the mouse cursor
             if (this->dragging_flag == true)
             {
-                // update the center of the rectangle on the screen to follow the mouse cursor
                 this->rect.set_center(_m + this->offset);
 
                 if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
@@ -181,7 +215,39 @@ void AnnotationInstance::update(void)
                     this->rect_on_image.set_center(this->rect.get_center() - this->window_pos); // update position
                 }
             }
-            // todo : edit single side on hover + drag + edge detection
+
+            // RESIZE MODE : follow mouse cursor based on proximity to edges
+            if (this->resizing_dir != Direction::NONE)
+            {
+                vec2f _br = this->rect.get_bottomright_vertex();
+                vec2f _tl = this->rect.get_topleft_vertex();
+                if (this->resizing_dir == Direction::DOWN)
+                {
+                    _br.y = _m.y;
+                }
+                else if (this->resizing_dir == Direction::UP)
+                {
+                    _tl.y = _m.y;
+                }
+                else if (this->resizing_dir == Direction::RIGHT)
+                {
+                    _br.x = _m.x;
+                }
+                else
+                {
+                    _tl.x = _m.x;
+                }
+
+                this->rect.set_bottomright_vertex(_br);
+                this->rect.set_topleft_vertex(_tl);
+
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                {
+                    this->resizing_dir = Direction::NONE; // reset
+                    this->request_json_write = true;      // request a json dump
+                    update_flag = true;                   // request bounding box update
+                }
+            }
         }
         else if (this->status_fsm.state() == StatusStates::CANCEL)
         {
@@ -197,7 +263,7 @@ void AnnotationInstance::update(void)
 void AnnotationInstance::draw_area(void)
 {
     ImDrawList *draw_list = ImGui::GetWindowDrawList();
-    float _thickness = 2.0;
+    float _thickness = 1.0;
     if (this->status_fsm.state() == StatusStates::CREATE)
     {
         // draw the rectangle all the way to the mouse cursor
