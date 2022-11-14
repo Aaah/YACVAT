@@ -142,7 +142,7 @@ void AnnotationInstance::update(void)
         if (this->status_fsm.state() == StatusStates::IDLE)
         {
             // switch to edit mode
-            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::HOVER))
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ((this->hover_fsm.state() == HoverStates::HOVER) || (this->hover_fsm.state() == HoverStates::INSIDE)))
             {
                 this->status_fsm.execute("from_idle_to_edit");
                 spdlog::debug("IDLE : switching to EDIT");
@@ -275,7 +275,7 @@ void AnnotationInstance::draw_area(void)
         if (this->status_fsm.state() == StatusStates::IDLE)
         {
             // change thickness if hovered
-            if (this->hover_fsm.state() == HoverStates::HOVER)
+            if (this->hover_fsm.state() == HoverStates::HOVER || (this->hover_fsm.state() == HoverStates::INSIDE))
             {
                 _thickness = 3.0;
             }

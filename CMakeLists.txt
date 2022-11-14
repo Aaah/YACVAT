@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14...3.24)
 # Project name and a few useful settings. Other commands can pick up the results
 project(
     Yacvat 
-    VERSION 1.2.9
+    VERSION 1.2.14
     DESCRIPTION "Yet Another Computer Vision Annotation Tool"
     LANGUAGES CXX)
 
