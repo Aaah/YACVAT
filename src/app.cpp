@@ -15,6 +15,7 @@
 #include <dirent.h>
 #include <set>
 #include <fstream>
+#include <algorithm> // for reverse
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -131,6 +132,10 @@ void AnnotationApp::ui_main_window(void)
             if (ImGui::MenuItem("Clear all"))
             {
                 this->clear_annotations();
+            }
+            if (ImGui::MenuItem("Import from previous image"))
+            {
+                this->import_annotations_from_prev();
             }
             ImGui::EndMenu();
         }
@@ -443,6 +448,7 @@ void AnnotationApp::json_read(void)
 
                 // switch state to idle
                 _inst.status_fsm.execute("from_create_to_idle");
+                _inst.hover_fsm.execute("from_hover_to_outside");
 
                 // push annotation instance
                 this->annotations.back().inst.push_back(_inst);
@@ -731,6 +737,12 @@ void AnnotationApp::parse_images_folder(std::string path)
                 spdlog::info("File added : {}", diread->d_name);
             }
         }
+
+        // sort filenames alphabetically
+        std::sort(this->image_files.begin(), this->image_files.end(),
+                  [](const std::string &a, const std::string &b) -> bool
+                  { return a < b; });
+
         closedir(dir);
     }
     else
@@ -805,4 +817,35 @@ void AnnotationApp::clear_annotations(void)
 {
     this->annotations.clear();
     this->ninstperimage.clear();
+}
+
+void AnnotationApp::import_annotations_from_prev(void)
+{
+    // find previous image than the current one
+    std::string prev_fname;
+    for (long unsigned int n = 1; n < this->image_files.size(); n++)
+    {
+        if (this->image_files[n].compare(this->image_fname) == 0)
+        {
+            prev_fname = this->image_files[n - 1];
+            break;
+        }
+    }
+
+    // import all annotations from this previous image
+    // if (!prev_fname.empty())
+    // {
+    //     for (auto &annotation : this->annotations)
+    //     {
+    //         for (auto &instance : annotation.inst)
+    //         {
+    //             if (instance.img_fname == prev_fname)
+    //             {
+    //                 AnnotationInstance _inst = AnnotationInstance(instance);
+    //                 _inst.set_fname(this->image_fname);
+    //                 annotation.inst.push_back(_inst);
+    //             }
+    //         }
+    //     }
+    // }
 }

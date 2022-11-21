@@ -12,6 +12,14 @@ Rectangle::Rectangle(vec2<float> start, vec2<float> end)
     set_bottomright_vertex(end);
 }
 
+Rectangle::Rectangle(const Rectangle &rhs)
+{
+    this->bottomright_vertex = rhs.bottomright_vertex;
+    this->topleft_vertex = rhs.topleft_vertex;
+    this->center = rhs.center;
+    this->span = rhs.span;
+}
+
 bool Rectangle::intersect(Rectangle rect)
 {
     if ((std::abs(center.x - rect.center.x) < 0.5 * (span.x + rect.span.x)) && (std::abs(center.y - rect.center.y) < 0.5 * (span.y + rect.span.y)))

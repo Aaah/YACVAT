@@ -9,6 +9,15 @@ class Rectangle
 public:
     Rectangle();
     Rectangle(vec2<float> start, vec2<float> end);
+    Rectangle(const Rectangle &rhs); // copy constructor
+    Rectangle &operator=(const Rectangle &rhs)
+    {
+        this->bottomright_vertex = rhs.bottomright_vertex;
+        this->topleft_vertex = rhs.topleft_vertex;
+        this->center = rhs.center;
+        this->span = rhs.span;
+        return *this;
+    };
 
     // setters
     void set_center(vec2<float> point);
