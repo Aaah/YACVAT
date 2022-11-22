@@ -422,7 +422,7 @@ void AnnotationApp::json_read(void)
             for (nlohmann::json::iterator j = insts.begin(); j != insts.end(); ++j)
             {
                 // create a new instance
-                AnnotationInstance _inst = AnnotationInstance();
+                AnnotationInstance _inst;
                 auto val = j.value();
 
                 // retrieve file name
@@ -620,7 +620,7 @@ void AnnotationApp::update_annotation_fsm(void)
         {
             if (this->annotations[n].selected)
             {
-                AnnotationInstance _ann = AnnotationInstance();
+                AnnotationInstance _ann;
                 _ann.set_fname(this->image_fname);
                 _ann.rect_on_image.set_bottomright_vertex(cursor_pos);
                 _ann.rect_on_image.set_topleft_vertex(cursor_pos);
@@ -833,19 +833,20 @@ void AnnotationApp::import_annotations_from_prev(void)
     }
 
     // import all annotations from this previous image
-    // if (!prev_fname.empty())
-    // {
-    //     for (auto &annotation : this->annotations)
-    //     {
-    //         for (auto &instance : annotation.inst)
-    //         {
-    //             if (instance.img_fname == prev_fname)
-    //             {
-    //                 AnnotationInstance _inst = AnnotationInstance(instance);
-    //                 _inst.set_fname(this->image_fname);
-    //                 annotation.inst.push_back(_inst);
-    //             }
-    //         }
-    //     }
-    // }
+    if (!prev_fname.empty())
+    {
+        for (auto &annotation : this->annotations)
+        {
+            for (auto &instance : annotation.inst)
+            {
+                if (instance.img_fname == prev_fname)
+                {
+                    // ? using copy constructor created by compiler by default
+                    AnnotationInstance _inst = AnnotationInstance(instance);
+                    _inst.set_fname(this->image_fname);
+                    annotation.inst.push_back(_inst);
+                }
+            }
+        }
+    }
 }

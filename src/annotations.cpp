@@ -84,6 +84,10 @@ AnnotationInstance::AnnotationInstance(void)
 //     this->rect_on_image = rhs.rect_on_image;
 //     this->update();
 //     this->update_bounding_box();
+
+//     this->selected = false;
+//     this->dragging_flag = false;
+//     this->resizing_dir = Direction::NONE;
 // }
 
 void AnnotationInstance::update_bounding_box(void)
