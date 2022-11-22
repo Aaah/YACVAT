@@ -848,5 +848,8 @@ void AnnotationApp::import_annotations_from_prev(void)
                 }
             }
         }
+
+        // dump new data to file
+        this->json_write();
     }
 }
