@@ -31,6 +31,8 @@ AnnotationApp::AnnotationApp(void)
     ext_set.insert("jpeg");
     ext_set.insert("jpg");
 
+    current_image_texture = 0;
+
     for (auto e : ext_set)
         spdlog::debug("set of extension allowed : {}", e);
 }
@@ -520,6 +522,7 @@ void AnnotationApp::ui_image_current()
         // ImGui::Text("pointer = %p", current_image_texture);
         // ImGui::Text("size = %d x %d", current_image_width, current_image_height);
         // ImGui::Text("window size = %.0f x %.0f", ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        vec2f view = ImGui::GetContentRegionAvail();
 
         // compute scaling factor to fir to the window (pane1)
         if (this->compute_scale_flag == true)
@@ -531,8 +534,17 @@ void AnnotationApp::ui_image_current()
             this->scale = std::min(ImGui::GetWindowWidth() / current_image_width, ImGui::GetWindowHeight() / current_image_height);
             spdlog::debug("Resizing factor : {}", this->scale);
 
+            // save view size
+            this->img_view.x = view.x;
+            this->img_view.y = view.y;
+
             // parse json once the scale is obtained
             this->json_read();
+        }
+
+        if ((view.x != this->img_view.x) || (view.y != this->img_view.y))
+        {
+            this->compute_scale_flag = true;
         }
 
         // draw image

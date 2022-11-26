@@ -37,6 +37,7 @@ private:
     nlohmann::json json;                      // json data structure
     bool compute_scale_flag;                  // compute scale factor to resize image
     std::map<std::string, int> ninstperimage; // dict to count the number of instances per image
+    vec2f img_view;                           // view size to display image (and check if resize)
 
     bool read_image(const char *filename, GLuint *out_texture, int *out_width, int *out_height);
     void check_annotations_file(void);             // look for the presence of an annotations file
