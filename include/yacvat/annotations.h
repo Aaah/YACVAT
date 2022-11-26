@@ -62,13 +62,14 @@ class AnnotationInstance
 {
 public:
     // methods
-    AnnotationInstance(void);                          // default constructor
-    void set_fname(std::string fname);                 // set file name
-    void set_color(float color[4]);                    // set color
-    void draw_area(void);                              // draw itself on picture
-    void draw_point(void);                             // draw itself on picture
-    void update(void);                                 // update fsm
-    void update_bounding_box(void);                    // update inner and outer hover box;
+    AnnotationInstance(void);          // default constructor
+    void set_fname(std::string fname); // set file name
+    void set_color(float color[4]);    // set color
+    void draw_area(void);              // draw itself on picture
+    void draw_point(void);             // draw itself on picture
+    void update_point(void);           // update fsm
+    void update_area(void);            // update fsm
+    void update_bounding_box(void);    // update inner and outer hover box;
 
     // attributes
     Rectangle rect_on_image;                                              // coordinates on image : x_start, y_start, x_end, y_end

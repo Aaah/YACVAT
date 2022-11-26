@@ -550,16 +550,15 @@ void AnnotationApp::ui_image_current()
             {
                 if (this->annotations[n].inst[m].img_fname == this->image_fname)
                 {
-                    // update logic
-                    this->annotations[n].inst[m].update();
-
-                    // draw on screen
+                    // update and draw on screen
                     if (this->annotations[n].type == ANNOTATION_TYPE_AREA)
                     {
+                        this->annotations[n].inst[m].update_area();
                         this->annotations[n].inst[m].draw_area();
                     }
                     else
                     {
+                        this->annotations[n].inst[m].update_point();
                         this->annotations[n].inst[m].draw_point();
                     }
                 }
@@ -662,7 +661,7 @@ void AnnotationApp::update_annotation_fsm(void)
             this->annotations[active_annotation].inst[active_instance].rect_on_image.set_center(cursor_pos);
             this->annotations[active_annotation].inst[active_instance].rect_on_image.set_span(vec2f(10, 10));
             this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
-            this->annotations[active_annotation].inst[active_instance].update();
+            this->annotations[active_annotation].inst[active_instance].update_point();
             this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
             need_json_write = true;
@@ -679,7 +678,7 @@ void AnnotationApp::update_annotation_fsm(void)
                 this->annotations[active_annotation].inst[active_instance].status_fsm.execute("from_create_to_idle");
 
                 // update state (bounding box)
-                this->annotations[active_annotation].inst[active_instance].update();
+                this->annotations[active_annotation].inst[active_instance].update_area();
                 this->annotations[active_annotation].inst[active_instance].update_bounding_box();
 
                 // request json update

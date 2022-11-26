@@ -89,7 +89,117 @@ void AnnotationInstance::set_color(float color[4])
         this->color_u8[k] = color[k] * 255;
 }
 
-void AnnotationInstance::update(void)
+void AnnotationInstance::update_point(void)
+{
+    vec2f _w = ImGui::GetWindowPos();
+    bool update_flag = false;
+    if ((_w.x != this->window_pos.x) || (_w.y != this->window_pos.y))
+    {
+        update_flag = true;
+        this->window_pos = _w;
+    }
+
+    vec2<float> _m = ImGui::GetMousePos();
+
+    // compute absolute coodinates of the start vertex
+    vec2f _rect_on_image_topleft = this->rect_on_image.get_topleft_vertex();
+    vec2f _rect_on_image_bottomright = this->rect_on_image.get_bottomright_vertex();
+
+    if (update_flag == true)
+        this->rect.set_topleft_vertex(vec2f(window_pos.x + _rect_on_image_topleft.x, window_pos.y + _rect_on_image_topleft.y));
+
+    // update HOVER fsm
+    if ((this->hover_fsm.state() == HoverStates::HOVER) && !outer_rect.inside(_m))
+    {
+        this->hover_fsm.execute("from_hover_to_outside");
+    }
+    else if ((this->hover_fsm.state() == HoverStates::HOVER) && inner_rect.inside(_m))
+    {
+        this->hover_fsm.execute("from_hover_to_inside");
+    }
+    else if ((this->hover_fsm.state() == HoverStates::OUTSIDE) && outer_rect.inside(_m))
+    {
+        this->hover_fsm.execute("from_outside_to_hover");
+    }
+    else if ((this->hover_fsm.state() == HoverStates::INSIDE) && !inner_rect.inside(_m))
+    {
+        this->hover_fsm.execute("from_inside_to_hover");
+    }
+
+    // update status fsm
+    if (this->status_fsm.state() == StatusStates::CREATE)
+    {
+        // the end vertex is the mouse position on screen
+        this->rect.set_bottomright_vertex(_m);
+    }
+    else
+    {
+        // the instance is unselected unless it is in edit mode
+        this->selected = false;
+
+        // position on screen of the end vertex
+        if (update_flag == true)
+            this->rect.set_bottomright_vertex(vec2f(_rect_on_image_bottomright.x + window_pos.x, _rect_on_image_bottomright.y + window_pos.y));
+
+        if (this->status_fsm.state() == StatusStates::IDLE)
+        {
+            // switch to edit mode
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ((this->hover_fsm.state() == HoverStates::INSIDE) || (this->hover_fsm.state() == HoverStates::HOVER)))
+            {
+                this->status_fsm.execute("from_idle_to_edit");
+                spdlog::debug("IDLE : switching to EDIT");
+            }
+        }
+        else if (this->status_fsm.state() == StatusStates::EDIT)
+        {
+            // the instance is selected by default in edit mode
+            this->selected = true;
+
+            // switch to idle mode
+            if (ImGui::IsKeyPressed(526) || (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (this->hover_fsm.state() == HoverStates::OUTSIDE)))
+            {
+                this->status_fsm.execute("from_edit_to_cancel");
+                spdlog::debug("EDIT : cancelling current action");
+            }
+
+            // drag instance around in the image
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left) &&                                                             // left click
+                ((this->hover_fsm.state() == HoverStates::INSIDE) || (this->hover_fsm.state() == HoverStates::HOVER)) && // inside the box
+                (this->dragging_flag == false) &&                                                                        // not dragging yet
+                (this->resizing_dir == Direction::NONE)                                                                  // not resizing
+            )
+            {
+                // update flag are set to trigger processing when the drag stops
+                this->dragging_flag = true;                  // now dragging
+                this->offset = this->rect.get_center() - _m; // offset between mouse and center of box
+            }
+
+            // DRAG MODE : update the center of the rectangle on the screen to follow the mouse cursor
+            if (this->dragging_flag == true)
+            {
+                this->rect.set_center(_m + this->offset);
+
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                {
+                    update_flag = true;                                                         // request bounding box update
+                    this->dragging_flag = false;                                                // reset the processing flag
+                    this->request_json_write = true;                                            // request a json dump
+                    this->rect_on_image.set_center(this->rect.get_center() - this->window_pos); // update position
+                }
+            }
+        }
+        else if (this->status_fsm.state() == StatusStates::CANCEL)
+        {
+            this->status_fsm.execute("from_cancel_to_idle");
+            spdlog::debug("CANCEL : switching back to IDLE");
+        }
+    }
+
+    if (update_flag == true)
+        this->update_bounding_box();
+}
+
+void AnnotationInstance::update_area(void)
 {
     vec2f _w = ImGui::GetWindowPos();
     bool update_flag = false;
