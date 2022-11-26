@@ -125,6 +125,11 @@ void AnnotationApp::ui_main_window(void)
 
     ImGui::BeginChild("Pane3", ImVec2(300, -1.f), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
+    if (ImGui::IsKeyPressed(ImGuiKey_Insert))
+    {
+        this->import_annotations_from_prev();
+    }
+
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu(ICON_FA_PENCIL "  Annotations"))
@@ -133,7 +138,7 @@ void AnnotationApp::ui_main_window(void)
             {
                 this->clear_annotations();
             }
-            if (ImGui::MenuItem("Import from previous image"))
+            if (ImGui::MenuItem("Import from previous image", "Insert"))
             {
                 this->import_annotations_from_prev();
             }

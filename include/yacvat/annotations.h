@@ -63,7 +63,6 @@ class AnnotationInstance
 public:
     // methods
     AnnotationInstance(void);                          // default constructor
-    // AnnotationInstance(const AnnotationInstance &rhs); // copy constructor
     void set_fname(std::string fname);                 // set file name
     void set_color(float color[4]);                    // set color
     void draw_area(void);                              // draw itself on picture

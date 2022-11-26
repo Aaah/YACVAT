@@ -56,40 +56,6 @@ AnnotationInstance::AnnotationInstance(void)
     this->resizing_dir = Direction::NONE;
 }
 
-// AnnotationInstance::AnnotationInstance(const AnnotationInstance &rhs)
-// {
-//     // finite state machine : status
-//     this->status_fsm.add_transitions({
-//         {StatusStates::CREATE, StatusStates::IDLE, "from_create_to_idle", nullptr, nullptr},
-//         {StatusStates::IDLE, StatusStates::EDIT, "from_idle_to_edit", nullptr, nullptr},
-//         {StatusStates::EDIT, StatusStates::IDLE, "from_edit_to_idle", nullptr, nullptr},
-//         {StatusStates::EDIT, StatusStates::CANCEL, "from_edit_to_cancel", nullptr, nullptr},
-//         {StatusStates::CANCEL, StatusStates::IDLE, "from_cancel_to_idle", nullptr, nullptr},
-//     });
-
-//     // finite state machine : mouse position to the box
-//     this->hover_fsm.add_transitions({
-//         {HoverStates::HOVER, HoverStates::INSIDE, "from_hover_to_inside", nullptr, nullptr},
-//         {HoverStates::HOVER, HoverStates::OUTSIDE, "from_hover_to_outside", nullptr, nullptr},
-//         {HoverStates::INSIDE, HoverStates::HOVER, "from_inside_to_hover", nullptr, nullptr},
-//         {HoverStates::OUTSIDE, HoverStates::HOVER, "from_outside_to_hover", nullptr, nullptr},
-//     });
-
-//     for (int n = 0; n < 4; n++)
-//         this->color_u8[n] = rhs.color_u8[n];
-
-//     this->delta = rhs.delta;
-//     this->set_fname(rhs.img_fname);
-
-//     this->rect_on_image = rhs.rect_on_image;
-//     this->update();
-//     this->update_bounding_box();
-
-//     this->selected = false;
-//     this->dragging_flag = false;
-//     this->resizing_dir = Direction::NONE;
-// }
-
 void AnnotationInstance::update_bounding_box(void)
 {
     // outer rect on screen
