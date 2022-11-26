@@ -1,10 +1,10 @@
 #include "yacvat/version.h"
-#include "yacvat/app.h"     
+#include "yacvat/app.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include "spdlog/spdlog.h"   // logs
+#include "spdlog/spdlog.h" // logs
 
 #include <filesystem>
 #include <stdio.h>
@@ -16,14 +16,11 @@
 #include <SDL_opengl.h>
 #endif
 
-// context application
-AnnotationApp app;
-
 // Main code
 int main(int argc, char **argv)
 {
     // logs level
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::critical);
 
     int c;
     int verbose_flag = 0;
@@ -45,7 +42,6 @@ int main(int argc, char **argv)
                 spdlog::info("Version of YACVAT is {}.{}.{}", YACVAT_VER_MAJOR, YACVAT_VER_MINOR, YACVAT_VER_PATCH);
             }
 
-            spdlog::set_level(spdlog::level::critical);
             if (verbose_flag)
             {
                 spdlog::set_level(spdlog::level::debug);
@@ -113,12 +109,12 @@ int main(int argc, char **argv)
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // setup graphical basics
+    // context application
+    AnnotationApp app;
     app.ui_initialize();
 
     // Our state
