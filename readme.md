@@ -36,7 +36,7 @@ cpack
 dpkg -i Yacvat-x.y.z-Linux.deb
 ```
 
-## Features in current version 1.1
+## Features in version 1.2
 
 This is the first released version. It can be considered as alpha since it has to be built from source and has not yet been tested by others. It has the following features :
 
@@ -44,11 +44,6 @@ This is the first released version. It can be considered as alpha since it has t
 - [x] Import/export annotations using the json file format
 - [x] Shortcuts : Use F-keys to quickly navigate and draw annotations
 - [x] Edit annotations if needed after they're drawn by selecting them and moving them around
-
-Tested on Linux only for now.
-
-## Planned for version 1.2
-
 - [x] Annotation instance count displayed by the image names;
 - [x] Embed font in application with icons;
 - [x] Gather sources as a lib using "proper" cmake design patterns;
