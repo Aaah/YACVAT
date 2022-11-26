@@ -317,9 +317,9 @@ void AnnotationInstance::draw_point(void)
 
         if ((this->hover_fsm.state() == HoverStates::INSIDE) || (this->dragging_flag == true))
         {
-            draw_list->AddCircleFilled(this->rect.get_center(), 10.0, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 25), 8);
+            draw_list->AddCircleFilled(this->rect.get_center(), 10.0, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], 25), 16);
         }
     }
 
-    draw_list->AddCircle(this->rect.get_center(), 10.0, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 8, _thickness);
+    draw_list->AddCircle(this->rect.get_center(), 10.0, IM_COL32(this->color_u8[0], this->color_u8[1], this->color_u8[2], this->color_u8[3]), 16, _thickness);
 }

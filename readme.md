@@ -56,8 +56,7 @@ Tested on Linux only for now.
 - [x] Package application as deb package;
 - [x] Make annotations resizable;
 - [x] Better slide when moving an annotation around (not jump to mouse cursor);
-- [x] Option to start next image with the same annotation instances than the current one;
-- [ ] Menu with some debug information.
+- [x] Option to start next image with the same annotation instances than the current one.
 
 ## Planned for version 1.3
 

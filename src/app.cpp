@@ -417,6 +417,7 @@ void AnnotationApp::json_read(void)
             }
 
             // add annotation to the list of valid annotations
+            _ann.selected = false;
             this->annotations.push_back(_ann);
         }
 
@@ -454,6 +455,7 @@ void AnnotationApp::json_read(void)
                 // switch state to idle
                 _inst.status_fsm.execute("from_create_to_idle");
                 _inst.hover_fsm.execute("from_hover_to_outside");
+                _inst.selected = false;
 
                 // push annotation instance
                 this->annotations.back().inst.push_back(_inst);
