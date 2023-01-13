@@ -23,6 +23,7 @@ private:
     bool open_images_folder_flag;             // flag to open file dialog
     bool load_json_flag;                      // flag to open and read a json
     bool save_json_flag;                      // flag to open and read a json
+    bool startup_flag;                        // popup on startup
     bool annotations_file_exists;             // is there an annotation file in the folder
     std::string images_folder;                // path to valid folder containing images
     std::vector<std::string> image_files;     // list of valid images in the folder

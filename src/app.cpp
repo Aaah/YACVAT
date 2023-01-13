@@ -32,6 +32,7 @@ AnnotationApp::AnnotationApp(void)
     ext_set.insert("jpg");
 
     current_image_texture = 0;
+    this->startup_flag = true;
 
     for (auto e : ext_set)
         spdlog::debug("set of extension allowed : {}", e);
@@ -79,6 +80,7 @@ void AnnotationApp::ui_main_window(void)
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
+
     ImGui::Begin("Annotation Tool", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize);
 
     ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -200,6 +202,31 @@ void AnnotationApp::ui_main_window(void)
     ImGui::EndChild();
 
     ImGui::PopStyleVar();
+
+    if (this->startup_flag)
+    {
+        ImGui::OpenPopup("Welcome !");
+        ImGui::SetNextWindowPos(viewport->GetCenter());
+    }
+
+    if (ImGui::BeginPopupModal("Welcome !", &this->startup_flag))
+    {
+        ImGui::Text("Get ready to label things!");
+        ImGui::Separator();
+        ImGui::Text("1. Open a folder containing images in the left panel.");
+        ImGui::Text("2. Create labels and customize them.");
+        ImGui::Text("3. Start labeling :");
+        ImGui::Text("\ta. Open an image to work on.");
+        ImGui::Text("\tb. Use the F keys to select labels and apply them to the currently selected image.");
+        ImGui::Text("\tc. Repeat a-b until done.");
+        ImGui::Text("\td. Save your labels by using the Save JSON menu option.");
+
+        if (ImGui::IsMouseClicked(0))
+            this->startup_flag = false;
+
+        ImGui::EndPopup();
+    }
+
     ImGui::End();
 }
 
