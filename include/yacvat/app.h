@@ -21,6 +21,8 @@ public:
 
 private:
     bool open_images_folder_flag;             // flag to open file dialog
+    bool load_json_flag;                      // flag to open and read a json
+    bool save_json_flag;                      // flag to open and read a json
     bool annotations_file_exists;             // is there an annotation file in the folder
     std::string images_folder;                // path to valid folder containing images
     std::vector<std::string> image_files;     // list of valid images in the folder
@@ -32,7 +34,7 @@ private:
     float scale;                              // scaling factor on the displayed image
     std::vector<Annotation> annotations;      // list of annotations available
     std::fstream fs;                          // file pointer to the annotation file
-    std::string annotation_fname;             // full path
+    std::string temp_annotation_fname;        // full path
     std::string image_fname;                  // currently opened image file name
     nlohmann::json json;                      // json data structure
     bool compute_scale_flag;                  // compute scale factor to resize image
@@ -46,8 +48,8 @@ private:
     void ui_images_folder(void);                   // draw the UI to displays files
     void ui_image_current(void);                   // display current image
     void ui_annotations_panel(void);               // create/edit annotations type
-    void json_read(void);                          // read/write info to the annotation file
-    void json_write(void);                         // read/write info to the annotation file
+    void json_read(std::string name);              // read/write info to the annotation file
+    void json_write(std::string name);             // read/write info to the annotation file
     void update_annotation_fsm(void);              // update the logic to handle annotation instances
     void clear_annotations(void);                  // clear all annotations
     void import_annotations_from_prev(void);       // import annotations from the previous image in the list

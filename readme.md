@@ -56,11 +56,11 @@ This is the first released version. It can be considered as alpha since it has t
 ## Planned for version 1.3
 
 - [x] Update UI for selecting a folder;
-- [ ] Additional resizing handles in the corners of the boxes;
-- [ ] Handle boxes overlap (select the one closest to the mouse);
-- [ ] JSON export : standard format easy to bootstrap with other tools;
-- [ ] JSON files : name options;
+- [x] Additional resizing handles in the corners of the boxes;
+- [x] JSON : load/save and use a local temp file to keep track of all changes;
 - [ ] UI : pop-ups on start-up for tips (open folder, ...);
+- [ ] Handle boxes overlap (select the one closest to the mouse);
+- [ ] JSON : standard format easy to bootstrap with other tools;
 - [ ] (dev) git submodules for dependencies;
 - [ ] Use Boost to handle paths;
 - [ ] (Optional) Build also on Windows.

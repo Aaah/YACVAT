@@ -142,9 +142,49 @@ void AnnotationApp::ui_main_window(void)
             {
                 this->import_annotations_from_prev();
             }
+            if (ImGui::MenuItem("Load JSON"))
+            {
+                this->load_json_flag = true;
+            }
+            if (ImGui::MenuItem("Save JSON"))
+            {
+                this->save_json_flag = true;
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
+    }
+
+    if (this->load_json_flag == true)
+    {
+        ImGuiFileDialog::Instance()->OpenDialog("JSONReadChooser", "Choose a JSON file", ".json", ".", ImGuiFileDialogFlags_Modal);
+        if (ImGuiFileDialog::Instance()->Display("JSONReadChooser"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                this->json_read(ImGuiFileDialog::Instance()->GetFilePathName());
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            this->load_json_flag = false;
+        }
+    }
+
+    if (this->save_json_flag == true)
+    {
+        ImGuiFileDialog::Instance()->OpenDialog("JSONWriteChooser", "Set a JSON file name", ".json", ".", ImGuiFileDialogFlags_Modal);
+        if (ImGuiFileDialog::Instance()->Display("JSONWriteChooser"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                this->json_write(ImGuiFileDialog::Instance()->GetFilePathName());
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            this->save_json_flag = false;
+        }
     }
 
     this->ui_annotations_panel();
@@ -319,19 +359,19 @@ void AnnotationApp::ui_annotations_panel(void)
 
     if (update_json_flag == true)
     {
-        this->json_write();
+        this->json_write(this->temp_annotation_fname);
     }
 }
 
-void AnnotationApp::json_write(void)
+void AnnotationApp::json_write(std::string fname)
 {
-    spdlog::debug("Writing json file : {}", this->annotation_fname.c_str());
+    spdlog::debug("Writing json file : {}", fname.c_str());
 
     // check if the annotation file exists, create it if needed
     if (!this->annotations_file_exists)
     {
-        spdlog::info("Creating json file : {}", this->annotation_fname.c_str());
-        fs.open(this->annotation_fname, std::ios::out | std::ios::app);
+        spdlog::info("Creating json file : {}", fname.c_str());
+        fs.open(fname, std::ios::out | std::ios::app);
         fs.close();
     }
 
@@ -367,20 +407,20 @@ void AnnotationApp::json_write(void)
     }
 
     // flush file
-    std::ofstream f(this->annotation_fname.c_str());
+    std::ofstream f(fname.c_str());
     f << std::setw(4) << json_data << std::endl; // pretty json using setw(4)
 }
 
-void AnnotationApp::json_read(void)
+void AnnotationApp::json_read(std::string file)
 {
-    spdlog::debug("Parsing json file : {}", this->annotation_fname.c_str());
+    spdlog::debug("Parsing json file : {}", file.c_str());
 
     // check if the annotation file exists
     if (this->annotations_file_exists == false)
         return;
 
     // parse the annotation file
-    std::ifstream f(this->annotation_fname.c_str());
+    std::ifstream f(file.c_str());
     this->json = nlohmann::json::parse(f);
 
     // empty list of annotations
@@ -471,7 +511,7 @@ void AnnotationApp::ui_images_folder(void)
 
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
-    if (ImGui::Button(ICON_FA_FOLDER_OPEN " Load Folder", ImVec2(-1,50)))
+    if (ImGui::Button(ICON_FA_FOLDER_OPEN " Load Folder", ImVec2(-1, 50)))
     {
         this->open_images_folder_flag = true;
     }
@@ -542,7 +582,7 @@ void AnnotationApp::ui_image_current()
             this->img_view.y = view.y;
 
             // parse json once the scale is obtained
-            this->json_read();
+            this->json_read(this->temp_annotation_fname);
         }
 
         if ((view.x != this->img_view.x) || (view.y != this->img_view.y))
@@ -704,12 +744,12 @@ void AnnotationApp::update_annotation_fsm(void)
 
     // update json
     if (need_json_write == true)
-        this->json_write();
+        this->json_write(this->temp_annotation_fname);
 }
 
 void AnnotationApp::check_annotations_file(void)
 {
-    std::ifstream f(this->annotation_fname.c_str());
+    std::ifstream f(this->temp_annotation_fname.c_str());
     this->annotations_file_exists = f.good();
     spdlog::debug("checking existence of annotation file : {}", this->annotations_file_exists);
 }
@@ -774,13 +814,13 @@ void AnnotationApp::parse_images_folder(std::string path)
     // memorizing the folder for later use
     this->images_folder = path;
 
-    // create a priori the annotation file name
-    this->annotation_fname = path + "/annotations.json";
-    spdlog::debug("Expected annotation file : {}", this->annotation_fname.c_str());
+    // create the local annotation filename
+    this->temp_annotation_fname = path + "/.yacvat-temp.json";
+    spdlog::debug("Expected annotation file : {}", this->temp_annotation_fname.c_str());
 
     // read and parse json file if it exists
     this->check_annotations_file();
-    this->json_read();
+    this->json_read(this->temp_annotation_fname);
 }
 
 // Simple helper function to load an image into a OpenGL texture with common settings
@@ -871,6 +911,6 @@ void AnnotationApp::import_annotations_from_prev(void)
         }
 
         // dump new data to file
-        this->json_write();
+        this->json_write(this->temp_annotation_fname);
     }
 }
