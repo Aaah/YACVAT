@@ -36,9 +36,9 @@ cpack
 dpkg -i Yacvat-x.y.z-Linux.deb
 ```
 
-## Features in version 1.2
+## Features in version 1.3
 
-This is the first released version. It can be considered as alpha since it has to be built from source and has not yet been tested by others. It has the following features :
+Release note 1.1 :
 
 - [x] Define annotation types as areas or points, assign colors and labels
 - [x] Import/export annotations using the json file format
@@ -47,18 +47,24 @@ This is the first released version. It can be considered as alpha since it has t
 - [x] Annotation instance count displayed by the image names;
 - [x] Embed font in application with icons;
 - [x] Gather sources as a lib using "proper" cmake design patterns;
+
+Release note 1.2 :
+
 - [x] Use github to host release artefacts;
 - [x] Package application as deb package;
 - [x] Make annotations resizable;
 - [x] Better slide when moving an annotation around (not jump to mouse cursor);
 - [x] Option to start next image with the same annotation instances than the current one.
 
-## Planned for version 1.3
+Release note 1.3 :
 
 - [x] Update UI for selecting a folder;
 - [x] Additional resizing handles in the corners of the boxes;
 - [x] JSON : load/save and use a local temp file to keep track of all changes;
-- [ ] UI : pop-ups on start-up for tips (open folder, ...);
+- [x] UI : pop-ups on start-up for tips (open folder, ...).
+
+## Planned for version 1.4
+
 - [ ] Handle boxes overlap (select the one closest to the mouse);
 - [ ] JSON : standard format easy to bootstrap with other tools;
 - [ ] (dev) git submodules for dependencies;
