@@ -76,8 +76,6 @@ void AnnotationApp::ui_initialize(void)
 
 void AnnotationApp::ui_main_window(void)
 {
-    // todo : resize panels when resizing the window
-
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -472,6 +470,11 @@ void AnnotationApp::ui_images_folder(void)
     static int selected = -1;
 
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
+
+    if (ImGui::Button(ICON_FA_FOLDER_OPEN " Load Folder", ImVec2(-1,50)))
+    {
+        this->open_images_folder_flag = true;
+    }
 
     if (ImGui::BeginTable("table_images", 2, flags))
     {
