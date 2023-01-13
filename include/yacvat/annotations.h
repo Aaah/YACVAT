@@ -52,10 +52,14 @@ enum class HoverStates
 enum class Direction
 {
     NONE,
-    UP,
+    TOP,
+    TOP_RIGHT,
     RIGHT,
-    DOWN,
+    BOTTOM_RIGHT,
+    BOTTOM,
+    BOTTOM_LEFT,
     LEFT,
+    TOP_LEFT,
 };
 
 class AnnotationInstance

@@ -282,21 +282,36 @@ void AnnotationInstance::update_area(void)
                 vec2f _br = this->rect.get_bottomright_vertex();
                 vec2f _tl = this->rect.get_topleft_vertex();
                 float rad = 10;
-                if (std::abs(_m.x - _br.x) < rad)
+
+                bool _top = std::abs(_m.y - _tl.y) < rad;
+                bool _bottom = std::abs(_m.y - _br.y) < rad;
+                bool _left = std::abs(_m.x - _tl.x) < rad;
+                bool _right = std::abs(_m.x - _br.x) < rad;
+
+                if (_top)
                 {
-                    this->resizing_dir = Direction::RIGHT;
+                    this->resizing_dir = Direction::TOP;
+
+                    if (_left)
+                        this->resizing_dir = Direction::TOP_LEFT;
+                    else if (_right)
+                        this->resizing_dir = Direction::TOP_RIGHT;
                 }
-                else if (std::abs(_m.x - _tl.x) < rad)
+                else if (_bottom)
                 {
-                    this->resizing_dir = Direction::LEFT;
-                }
-                else if (std::abs(_m.y - _br.y) < rad)
-                {
-                    this->resizing_dir = Direction::DOWN;
+                    this->resizing_dir = Direction::BOTTOM;
+
+                    if (_left)
+                        this->resizing_dir = Direction::BOTTOM_LEFT;
+                    else if (_right)
+                        this->resizing_dir = Direction::BOTTOM_RIGHT;
                 }
                 else
                 {
-                    this->resizing_dir = Direction::UP;
+                    if (_left)
+                        this->resizing_dir = Direction::LEFT;
+                    else if (_right)
+                        this->resizing_dir = Direction::RIGHT;
                 }
 
                 spdlog::debug("RESIZING direction : {}", int(this->resizing_dir));
@@ -333,19 +348,21 @@ void AnnotationInstance::update_area(void)
             {
                 vec2f _br = this->rect.get_bottomright_vertex();
                 vec2f _tl = this->rect.get_topleft_vertex();
-                if (this->resizing_dir == Direction::DOWN)
+
+                if ((this->resizing_dir == Direction::BOTTOM) || (this->resizing_dir == Direction::BOTTOM_LEFT) || (this->resizing_dir == Direction::BOTTOM_RIGHT))
                 {
                     _br.y = _m.y;
                 }
-                else if (this->resizing_dir == Direction::UP)
+                else if ((this->resizing_dir == Direction::TOP) || (this->resizing_dir == Direction::TOP_LEFT) || (this->resizing_dir == Direction::TOP_RIGHT))
                 {
                     _tl.y = _m.y;
                 }
-                else if (this->resizing_dir == Direction::RIGHT)
+
+                if ((this->resizing_dir == Direction::RIGHT) || (this->resizing_dir == Direction::BOTTOM_RIGHT) || (this->resizing_dir == Direction::TOP_RIGHT))
                 {
                     _br.x = _m.x;
                 }
-                else
+                else if ((this->resizing_dir == Direction::LEFT) || (this->resizing_dir == Direction::BOTTOM_LEFT) || (this->resizing_dir == Direction::TOP_LEFT))
                 {
                     _tl.x = _m.x;
                 }
